@@ -11,11 +11,13 @@
     "@chakra-ui/react": "^1.1.2",
     "@emotion/react": "^11.1.4",
     "@emotion/styled": "^11.0.0",
+    "@zoomus/websdk": "^1.9.0",
     "emotion-theming": "^11.0.0",
     "framer-motion": "^3.2.0",
     "next": "10.0.5",
     "react": "17.0.1",
-    "react-dom": "17.0.1"
+    "react-dom": "17.0.1",
+    "react-icons": "^4.2.0"
   },
   "devDependencies": {
     "@types/node": "^14.14.20",
