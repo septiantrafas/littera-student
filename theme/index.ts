@@ -14,6 +14,8 @@ const overrides = {
   // styles,
   colors,
   breakpoints,
+  initialColorMode: "light",
+  useSystemColorMode: false,
   //   // Other foundational style overrides go here
   //   components: {
   //     Button,
