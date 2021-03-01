@@ -1,10 +1,10 @@
 import React from "react";
-import PageWithLayoutType from "../../types/pageWithLayout";
+import PageWithLayoutType from "@/types/pageWithLayout";
 
-import Authenticated from "../../layouts/authenticated";
-import Default from "../../layouts/default";
-import { LoginForm } from "../../components/LoginForm";
-import { DividerWithText } from "../../components/DividerWithText";
+import Authenticated from "@/layouts/authenticated";
+import Default from "@/layouts/default";
+import { LoginForm } from "@/components/LoginForm";
+import { DividerWithText } from "@/components/DividerWithText";
 import { FaFacebook, FaGoogle, FaGithub } from "react-icons/fa";
 import NextLink from "next/link";
 import {
@@ -18,7 +18,7 @@ import {
   useColorModeValue as mode,
   VisuallyHidden,
 } from "@chakra-ui/react";
-import { LogoAlt } from "../../components/LogoAlt";
+import { LogoAlt } from "@/components/LogoAlt";
 
 const Signin: React.FC = () => {
   return (

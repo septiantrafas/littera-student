@@ -1,5 +1,5 @@
 import { CSSReset } from "@chakra-ui/react";
-import PageWithLayoutType from "../types/pageWithLayout";
+import PageWithLayoutType from "@/types/pageWithLayout";
 import theme from "../theme";
 import { Chakra } from "../Chakra";
 

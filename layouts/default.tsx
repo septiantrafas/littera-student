@@ -8,7 +8,7 @@ import {
   Flex,
   Box,
 } from "@chakra-ui/react";
-import { Logo } from "../components/Logo";
+import { Logo } from "@/components/Logo";
 import { HiMoon, HiSun } from "react-icons/hi";
 
 type LayoutProps = {

@@ -1,10 +1,10 @@
 import Head from "next/head";
 // import Image from "next/image";
-import styles from "../styles/Home.module.css";
-import React from "react";
-import PageWithLayoutType from "../../types/pageWithLayout";
 
-import Exam from "../../layouts/exam";
+import React from "react";
+import PageWithLayoutType from "@/types/pageWithLayout";
+
+import Exam from "@/layouts/exam";
 import {
   Alert,
   AlertDescription,

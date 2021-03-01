@@ -1,9 +1,9 @@
 import Head from "next/head";
-import styles from "../styles/Home.module.css";
-import React from "react";
-import PageWithLayoutType from "../../types/pageWithLayout";
 
-import Exam from "../../layouts/exam";
+import React from "react";
+import PageWithLayoutType from "@/types/pageWithLayout";
+
+import Exam from "@/layouts/exam";
 import { Box, Flex, Progress, Spinner, Text } from "@chakra-ui/react";
 import { HiOutlineExclamation } from "react-icons/hi";
 

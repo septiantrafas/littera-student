@@ -1,9 +1,9 @@
 import { GetStaticPaths } from "next";
 // import Image from "next/image";
 import React from "react";
-import PageWithLayoutType from "../../../types/pageWithLayout";
+import PageWithLayoutType from "@/types/pageWithLayout";
 
-import Exam from "../../../layouts/exam";
+import Exam from "@/layouts/exam";
 import { Box, Text } from "@chakra-ui/react";
 import { HiOutlineVideoCamera, HiOutlineMicrophone } from "react-icons/hi";
 

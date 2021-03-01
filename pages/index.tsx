@@ -1,8 +1,8 @@
 import Head from "next/head";
 import React from "react";
 import NextLink from "next/link";
-import PageWithLayoutType from "../types/pageWithLayout";
-import Default from "../layouts/default";
+import PageWithLayoutType from "@/types/pageWithLayout";
+import Default from "@/layouts/default";
 import { Flex, Heading, chakra, Text, Link } from "@chakra-ui/react";
 
 const Home: React.FC = () => {
