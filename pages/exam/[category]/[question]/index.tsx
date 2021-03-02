@@ -13,15 +13,21 @@ type IQuestionUrl = {
 };
 
 type IQuestionProps = {
-  difficulty: string;
+  answer: string[];
   question: string;
 };
 
 const ExamQuestionPage = (props: IQuestionProps) => {
   return (
     <>
-      <p>{props.difficulty}</p>
       <p>{props.question}</p>
+      <ul>
+        {props.answer.map((item, index) => (
+          <li key="{item}">
+            {index + 1} {item}
+          </li>
+        ))}
+      </ul>
     </>
   );
 };
@@ -30,15 +36,15 @@ const ExamQuestionPage = (props: IQuestionProps) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   // Fetch data from external API
   const res = await fetch(
-    `https://opentdb.com/api.php?amount=20&category=${context.params.category}&type=multiple`
+    `http://localhost:3001/categories/${context.params.category}?_embed=questions`
   );
   const data = await res.json();
-  const results = data.results[Number(context.params.question)];
+  const results = data.questions[Number(context.params.question)];
 
   // Pass data to the page via props
   return {
     props: {
-      difficulty: results.difficulty,
+      answer: results.answer,
       question: results.question,
     },
   };
