@@ -1,12 +1,13 @@
 // Read more about faker here http://marak.github.io/faker.js/
 const faker = require("faker");
 
-const categories_count = 7;
-const questions_count = 200;
+let categories_count = 7;
+let questions_count;
 
 let database = {
   categories: [],
   questions: [],
+  subquestions: [],
 };
 
 for (let i = 1; i <= categories_count; i++) {
@@ -20,10 +21,38 @@ for (let i = 1; i <= categories_count; i++) {
   });
 }
 
-for (let i = 1; i <= questions_count; i++) {
-  database.questions.push({
+for (let i = 1; i <= categories_count; i++) {
+  if (i === 1) {
+    questions_count = 4;
+  } else {
+    questions_count = 40;
+  }
+  for (let j = 1; j <= questions_count; j++) {
+    let answer = [];
+
+    if (i !== 1) {
+      answer = [
+        faker.lorem.sentence(),
+        faker.lorem.sentence(),
+        faker.lorem.sentence(),
+        faker.lorem.sentence(),
+      ];
+    }
+
+    database.questions.push({
+      id: j,
+      categoryId: i,
+      question: faker.lorem.paragraph(),
+      answer: answer,
+      createdAt: faker.date.recent(),
+    });
+  }
+}
+
+for (let i = 1; i <= 64; i++) {
+  database.subquestions.push({
     id: i,
-    categoryId: faker.random.number({ max: 7 }),
+    questionId: (i % 4) + 1,
     question: faker.lorem.paragraph(),
     answer: [
       faker.lorem.sentence(),
