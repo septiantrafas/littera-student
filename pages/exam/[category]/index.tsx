@@ -4,7 +4,8 @@ import React from "react";
 import PageWithLayoutType from "@/types/pageWithLayout";
 
 import Exam from "@/layouts/exam";
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Button, Text } from "@chakra-ui/react";
+import dayjs from "dayjs";
 import { HiOutlineVideoCamera, HiOutlineMicrophone } from "react-icons/hi";
 
 type ICategoryUrl = {
@@ -19,12 +20,32 @@ type ICategoryProps = {
 };
 
 const ExamCategoryPage = (props: ICategoryProps) => {
+  const start_time = dayjs(props.start_time);
+  const end_time = dayjs(props.end_time);
+  const duration = end_time.diff(start_time, "minutes");
+
   return (
     <>
-      <p>{props.title}</p>
-      <p>{props.description}</p>
-      <p>{props.start_time}</p>
-      <p>{props.end_time}</p>
+      <Box my="8">
+        <Text fontSize="xl" fontWeight="bold" textAlign="center">
+          {props.title}
+        </Text>
+        <Text fontSize="lg" textAlign="center">
+          Total Waktu {duration} Menit
+        </Text>
+      </Box>
+      <Box mx="20" mb="6">
+        <Text fontSize="lg" fontWeight="semibold">
+          Instruksi
+        </Text>
+        <Text>{props.description}</Text>
+      </Box>
+      <Box mx="20" mb="6">
+        <Text fontSize="lg" fontWeight="semibold">
+          Contoh Soal
+        </Text>
+        <Text>{props.description}</Text>
+      </Box>
     </>
   );
 };
@@ -34,14 +55,16 @@ export const getStaticPaths: GetStaticPaths<ICategoryUrl> = async () => {
   const res = await fetch("http://localhost:3001/categories");
   const categories = await res.json();
 
+  const paths = categories.map((category) => ({
+    params: {
+      category: category.id.toString(),
+    },
+  }));
+
   // We'll pre-render only these paths at build time.
   // { fallback: false } means other routes should 404.
   return {
-    paths: categories.map((category) => ({
-      params: {
-        category: category.id.toString(),
-      },
-    })),
+    paths,
     fallback: false,
   };
 };
