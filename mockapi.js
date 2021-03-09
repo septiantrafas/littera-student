@@ -1,5 +1,6 @@
 // Read more about faker here http://marak.github.io/faker.js/
 const faker = require("faker");
+const dayjs = require("dayjs");
 
 let categories_count = 7;
 let questions_count;
@@ -29,23 +30,43 @@ for (let i = 1; i <= categories_count; i++) {
   }
   for (let j = 1; j <= questions_count; j++) {
     let answer = [];
+    let question = faker.lorem.paragraph();
+    let instruction_time = faker.date.soon();
+    let start_time = faker.date.recent();
+    let end_time = faker.date.soon();
 
-    if (i !== 1) {
-      answer = [
-        faker.lorem.sentence(),
-        faker.lorem.sentence(),
-        faker.lorem.sentence(),
-        faker.lorem.sentence(),
-      ];
-    }
+    const questions = () => {
+      let subquestion_case = {
+        instruction_time: instruction_time,
+        start_time: start_time,
+        end_time: end_time,
+        answer: answer,
+      };
 
-    database.questions.push({
-      id: j,
-      categoryId: i,
-      question: faker.lorem.paragraph(),
-      answer: answer,
-      createdAt: faker.date.recent(),
-    });
+      if (i !== 1) {
+        subquestion_case = {
+          instruction_time: null,
+          start_time: null,
+          end_time: null,
+          answer: [
+            faker.lorem.sentence(),
+            faker.lorem.sentence(),
+            faker.lorem.sentence(),
+            faker.lorem.sentence(),
+          ],
+        };
+      }
+
+      return {
+        id: j,
+        categoryId: i,
+        question: question,
+        ...subquestion_case,
+        createdAt: faker.date.recent(),
+      };
+    };
+
+    database.questions.push(questions());
   }
 }
 
