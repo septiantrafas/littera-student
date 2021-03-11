@@ -16,14 +16,17 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import PageWithLayoutType from "@/types/pageWithLayout";
 import Exam from "@/layouts/exam";
+import { inject, observer } from "mobx-react";
+import { DataStore } from "@/stores/DataStore";
 
 type IQuestionProps = {
+  dataStore?: DataStore;
   id: number;
   category_id: number;
   question_id: number;
   answer: string[];
   question: string;
-  total_question: number;
+  total_subquestion: number;
 };
 
 const ExamSubQuestionPage = (props: IQuestionProps) => {
@@ -31,18 +34,19 @@ const ExamSubQuestionPage = (props: IQuestionProps) => {
   const [value, setValue] = useState<string | number>("1");
 
   function getNextRoute() {
-    const next_question = props.id + 1;
-    const next_category = props.question_id + 1;
+    const next_subquestion = props.id + 1;
+    const next_question = props.question_id + 1;
 
-    if (props.id !== props.total_question) {
-      return `/exam/${props.category_id}/${props.question_id}/${next_question}`;
+    if (!isLastSubquestion()) {
+      return `/exam/${props.category_id}/${props.question_id}/${next_subquestion}`;
     } else {
-      if (props.question_id !== 7) {
-        return `/exam/${next_category}`;
-      } else {
-        return `/exam/lobby`;
-      }
+      // return `/exam/${props.category_id}/${next_question}`;
+      return `/exam/${props.category_id}/${next_question}`;
     }
+  }
+
+  function isLastSubquestion(): boolean {
+    return props.id === props.total_subquestion;
   }
 
   return (
@@ -88,7 +92,12 @@ const ExamSubQuestionPage = (props: IQuestionProps) => {
           </Stack>
         </RadioGroup>
         <Flex alignItems="end">
-          <Button onClick={() => router.push(getNextRoute())}>Next</Button>
+          <Button
+            onClick={() => router.push(getNextRoute())}
+            hidden={isLastSubquestion()}
+          >
+            Next
+          </Button>
         </Flex>
       </Box>
     </>
@@ -119,15 +128,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       id: Number(context.params.subquestion),
-      category_id: Number(context.params.categories),
-      question_id: Number(results.id),
+      category_id: Number(context.params.category),
+      question_id: Number(context.params.question),
       question: results.question,
       answer: results.answer,
-      total_question: Object.keys(data.subquestions).length,
+      total_subquestion: Object.keys(data.subquestions).length,
     },
   };
 };
 
 (ExamSubQuestionPage as PageWithLayoutType).layout = Exam;
 
-export default ExamSubQuestionPage;
+export default inject("dataStore")(observer(ExamSubQuestionPage));

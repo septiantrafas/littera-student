@@ -1,9 +1,7 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
-import NextLink from "next/link";
 import { useRouter } from "next/router";
 
-import React from "react";
 import PageWithLayoutType from "@/types/pageWithLayout";
 
 import Exam from "@/layouts/exam";
@@ -14,20 +12,23 @@ import {
   RadioGroup,
   Stack,
   Text,
-  LinkBox,
-  LinkOverlay,
   Flex,
-  ScaleFade,
 } from "@chakra-ui/react";
-import { HiOutlineVideoCamera, HiOutlineMicrophone } from "react-icons/hi";
+import { inject, observer } from "mobx-react";
+import { DataStore } from "@/stores/DataStore";
+import dayjs from "dayjs";
 
 type IQuestionUrl = {
   question: string;
 };
 
 type IQuestionProps = {
+  dataStore?: DataStore;
   id: number;
   category_id: number;
+  instruction_time: string;
+  start_time: string;
+  end_time: string;
   answer: string[];
   subquestion_route: any;
   question: string;
@@ -35,8 +36,23 @@ type IQuestionProps = {
 };
 
 const ExamQuestionPage = (props: IQuestionProps) => {
+  const dataStore = props.dataStore;
   const router = useRouter();
   const [value, setValue] = useState<string | number>("1");
+
+  const instruction_time = dayjs(props.instruction_time);
+  if (dayjs().isBefore(instruction_time)) {
+    dataStore.changeEndTime(props.instruction_time);
+  } else {
+    dataStore.changeEndTime(props.end_time);
+  }
+
+  useEffect(() => {
+    return () => {
+      dataStore.changeEndTime(props.end_time);
+      router.push(`/exam/${props.category_id}/${props.id}/1`);
+    };
+  }, [dataStore.endTime]);
 
   function getNextRoute() {
     const next_question = props.id + 1;
@@ -129,6 +145,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       id: Number(params.question),
       category_id: Number(params.category),
+      instruction_time: results.instruction_time,
+      start_time: results.start_time,
+      end_time: results.end_time,
       answer: results.answer,
       subquestion_route: subquestion_route,
       question: results.question,
@@ -139,4 +158,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 (ExamQuestionPage as PageWithLayoutType).layout = Exam;
 
-export default ExamQuestionPage;
+export default inject("dataStore")(observer(ExamQuestionPage));
