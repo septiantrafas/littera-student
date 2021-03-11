@@ -1,5 +1,4 @@
 import React from "react";
-import NextLink from "next/link";
 
 import {
   useColorMode,
@@ -9,6 +8,7 @@ import {
   Box,
 } from "@chakra-ui/react";
 import { Logo } from "@/components/Logo";
+import { TimeKeeper } from "@/components/TimeKeeper";
 import { HiMoon, HiSun } from "react-icons/hi";
 
 type LayoutProps = {
@@ -29,14 +29,17 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
         borderColor={mode("gray.200", "transparent")}
       >
         <Logo h="6" iconColor={mode("gray.900", "gray.200")} />
-
-        <IconButton
-          aria-label={
-            colorMode === "light" ? "Toggle dark mode" : "Toggle light mode"
-          }
-          icon={colorMode === "light" ? <HiMoon /> : <HiSun />}
-          onClick={toggleColorMode}
-        />
+        <Flex alignItems="center">
+          <TimeKeeper />
+          <IconButton
+            aria-label={
+              colorMode === "light" ? "Toggle dark mode" : "Toggle light mode"
+            }
+            icon={colorMode === "light" ? <HiMoon /> : <HiSun />}
+            onClick={toggleColorMode}
+            ml="2"
+          />
+        </Flex>
       </Flex>
       {children}
     </Box>
