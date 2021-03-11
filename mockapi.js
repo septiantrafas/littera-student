@@ -2,6 +2,11 @@
 const faker = require("faker");
 const dayjs = require("dayjs");
 
+const recent_date = dayjs();
+const soon_date = (date) => {
+  return date.add(1, "minute");
+};
+
 let categories_count = 7;
 let questions_count;
 
@@ -11,14 +16,18 @@ let database = {
   subquestions: [],
 };
 
+let get_recent_soon_date = recent_date;
 for (let i = 1; i <= categories_count; i++) {
+  const end_time = soon_date(get_recent_soon_date);
+  get_recent_soon_date = end_time;
+
   database.categories.push({
     id: i,
     title: faker.lorem.sentence(),
     description: faker.lorem.paragraphs(4),
-    start_time: faker.date.recent(),
-    end_time: faker.date.soon(),
-    createdAt: faker.date.recent(),
+    start_time: recent_date,
+    end_time: end_time,
+    createdAt: recent_date,
   });
 }
 
@@ -28,12 +37,14 @@ for (let i = 1; i <= categories_count; i++) {
   } else {
     questions_count = 40;
   }
+
+  let recent = recent_date;
   for (let j = 1; j <= questions_count; j++) {
     let answer = [];
     let question = faker.lorem.paragraph();
-    let instruction_time = faker.date.soon();
-    let start_time = faker.date.recent();
-    let end_time = faker.date.soon();
+    let instruction_time = soon_date(recent);
+    let start_time = soon_date(instruction_time);
+    let end_time = soon_date(start_time);
 
     const questions = () => {
       let subquestion_case = {
@@ -62,7 +73,7 @@ for (let i = 1; i <= categories_count; i++) {
         categoryId: i,
         question: question,
         ...subquestion_case,
-        createdAt: faker.date.recent(),
+        createdAt: recent_date,
       };
     };
 
@@ -81,7 +92,7 @@ for (let i = 1; i <= 64; i++) {
       faker.lorem.sentence(),
       faker.lorem.sentence(),
     ],
-    createdAt: faker.date.recent(),
+    createdAt: recent_date,
   });
 }
 
