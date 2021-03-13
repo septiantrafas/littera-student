@@ -28,7 +28,7 @@ const ExamCategoryPage = (props: ICategoryProps) => {
   const end_time = dayjs(props.end_time);
   const duration = end_time.diff(start_time, "minutes");
 
-  store.changeEndTime(end_time.toString());
+  store.updateEndTime(end_time.toString());
 
   return (
     <>

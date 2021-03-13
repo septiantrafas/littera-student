@@ -18,10 +18,7 @@ import {
 import { observer } from "mobx-react";
 import dayjs from "dayjs";
 import { useTimeStore } from "providers/RootStoreProvider";
-
-type IQuestionUrl = {
-  question: string;
-};
+import { reaction } from "mobx";
 
 type IQuestionProps = {
   id: number;
@@ -41,18 +38,21 @@ const ExamQuestionPage = (props: IQuestionProps) => {
   const [value, setValue] = useState<string | number>("1");
 
   const instruction_time = dayjs(props.instruction_time);
-  if (dayjs().isBefore(instruction_time)) {
-    store.changeEndTime(props.instruction_time);
-  } else {
-    store.changeEndTime(props.end_time);
-  }
+  useEffect(() => {
+    if (dayjs().isBefore(instruction_time)) {
+      store.updateEndTime(props.instruction_time);
+    } else {
+      console.log(dayjs().isBefore(instruction_time));
+      store.updateEndTime(props.end_time);
+    }
+  }, []);
 
   useEffect(() => {
-    return () => {
-      store.changeEndTime(props.end_time);
+    if (dayjs().isAfter(instruction_time)) {
       router.push(`/exam/${props.category_id}/${props.id}/1`);
-    };
-  }, [store.endTime]);
+      store.updateEndTime(props.end_time);
+    }
+  }, [store.END_TIME]);
 
   function getNextRoute() {
     const next_question = props.id + 1;
