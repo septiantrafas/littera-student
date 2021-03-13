@@ -1,6 +1,14 @@
-import { makeAutoObservable, observable, computed, action } from "mobx";
+import {
+  makeAutoObservable,
+  observable,
+  computed,
+  action,
+  autorun,
+} from "mobx";
 import { enableStaticRendering } from "mobx-react";
 import { RootStore } from "@/stores/RootStore";
+import { io } from "socket.io-client";
+import dayjs from "dayjs";
 
 const isServer = typeof window === "undefined";
 // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -12,9 +20,9 @@ export type TimeHydration = {
 
 export class TimeStore {
   root: RootStore;
-  time: string | undefined;
-  startTime: string | undefined;
-  endTime: string | undefined;
+  TIME: string | undefined;
+  START_TIME: string | undefined;
+  END_TIME: string | undefined;
 
   constructor(root: RootStore) {
     this.root = root;
@@ -22,18 +30,18 @@ export class TimeStore {
   }
 
   hydrate(data: TimeHydration) {
-    this.time = data.time != null ? data.time : "";
+    this.TIME = data.time != null ? data.time : "";
   }
 
-  changeTime(newTime: string) {
-    this.time = newTime;
+  updateTime(value: string) {
+    this.TIME = value;
   }
 
-  changeStartTime(newTime: string) {
-    this.startTime = newTime;
+  updateStartTime(value: string) {
+    this.START_TIME = value;
   }
 
-  changeEndTime(newTime: string) {
-    this.endTime = newTime;
+  updateEndTime(value: string) {
+    this.END_TIME = value;
   }
 }

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { inject } from "mobx-react";
 import { observer } from "mobx-react-lite";
 import { useTimeStore } from "providers/RootStoreProvider";
 
@@ -23,7 +22,7 @@ export const TimeKeeper = observer((props: Props) => {
       const socket = io();
 
       socket.on("counter", function (time: string) {
-        store.changeTime(time);
+        store.updateTime(time);
         manipulate_countdown(time);
       });
 
@@ -33,13 +32,13 @@ export const TimeKeeper = observer((props: Props) => {
 
   const manipulate_countdown = (time: string) => {
     const now = dayjs(time).toDate().getTime();
-    const end_time = dayjs(store.endTime).toDate().getTime();
+    const end_time = dayjs(store.END_TIME).toDate().getTime();
     const time_difference = dayjs(end_time - now).utcOffset(0);
 
     setCountdown(time_difference.format("HH:mm:ss"));
 
     if (time_difference.unix() < 0) {
-      store.changeEndTime("");
+      store.updateEndTime("");
       setCountdown("");
     }
   };
