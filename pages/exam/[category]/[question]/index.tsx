@@ -3,27 +3,27 @@ import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 
 import PageWithLayoutType from "@/types/pageWithLayout";
-
+import { QuestionNavigator } from "@/components/QuestionNavigator";
 import Exam from "@/layouts/exam";
 import {
   Box,
   Button,
   Radio,
   RadioGroup,
+  useColorModeValue as mode,
   Stack,
   Text,
   Flex,
 } from "@chakra-ui/react";
-import { inject, observer } from "mobx-react";
-import { DataStore } from "@/stores/DataStore";
+import { observer } from "mobx-react";
 import dayjs from "dayjs";
+import { useTimeStore } from "providers/RootStoreProvider";
 
 type IQuestionUrl = {
   question: string;
 };
 
 type IQuestionProps = {
-  dataStore?: DataStore;
   id: number;
   category_id: number;
   instruction_time: string;
@@ -36,23 +36,23 @@ type IQuestionProps = {
 };
 
 const ExamQuestionPage = (props: IQuestionProps) => {
-  const dataStore = props.dataStore;
+  const store = useTimeStore();
   const router = useRouter();
   const [value, setValue] = useState<string | number>("1");
 
   const instruction_time = dayjs(props.instruction_time);
   if (dayjs().isBefore(instruction_time)) {
-    dataStore.changeEndTime(props.instruction_time);
+    store.changeEndTime(props.instruction_time);
   } else {
-    dataStore.changeEndTime(props.end_time);
+    store.changeEndTime(props.end_time);
   }
 
   useEffect(() => {
     return () => {
-      dataStore.changeEndTime(props.end_time);
+      store.changeEndTime(props.end_time);
       router.push(`/exam/${props.category_id}/${props.id}/1`);
     };
-  }, [dataStore.endTime]);
+  }, [store.endTime]);
 
   function getNextRoute() {
     const next_question = props.id + 1;
@@ -70,15 +70,24 @@ const ExamQuestionPage = (props: IQuestionProps) => {
   }
 
   return (
-    <>
-      <Box w="50%" mx="20" my="10">
+    <Flex mx="auto" maxW="6xl" mt="8">
+      <Box
+        w="70%"
+        px="10"
+        py="6"
+        mr="10"
+        bg={mode("white", "gray.700")}
+        borderWidth="1px"
+        borderRadius="md"
+        shadow={mode("md", "lg")}
+      >
         <Text fontSize="lg" fontWeight="semibold">
           {props.id}. {props.question}
         </Text>
         <RadioGroup
           onChange={(string) => setValue(string)}
           value={value}
-          my="6"
+          mt="6"
         >
           <Stack direction="column" spacing="4">
             {props.answer.map((item) => (
@@ -111,11 +120,27 @@ const ExamQuestionPage = (props: IQuestionProps) => {
             ))}
           </Stack>
         </RadioGroup>
-        <Flex alignItems="end" hidden={props.subquestion_route}>
-          <Button onClick={() => router.push(getNextRoute())}>Next</Button>
+      </Box>
+      <Box w="30%" px="8" justifyContent="space-between">
+        <QuestionNavigator
+          category_id={props.category_id}
+          question_id={props.id}
+          total_question={props.total_question}
+        />
+        <Flex
+          w="full"
+          justifyContent="flex-end"
+          hidden={props.subquestion_route}
+        >
+          <Button
+            colorScheme="blue"
+            onClick={() => router.push(getNextRoute())}
+          >
+            Next
+          </Button>
         </Flex>
       </Box>
-    </>
+    </Flex>
   );
 };
 
@@ -158,4 +183,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 (ExamQuestionPage as PageWithLayoutType).layout = Exam;
 
-export default inject("dataStore")(observer(ExamQuestionPage));
+export default observer(ExamQuestionPage);

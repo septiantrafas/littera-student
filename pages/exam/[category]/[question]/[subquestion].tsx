@@ -17,10 +17,9 @@ import { useState } from "react";
 import PageWithLayoutType from "@/types/pageWithLayout";
 import Exam from "@/layouts/exam";
 import { inject, observer } from "mobx-react";
-import { DataStore } from "@/stores/DataStore";
+import { useTimeStore } from "providers/RootStoreProvider";
 
 type IQuestionProps = {
-  dataStore?: DataStore;
   id: number;
   category_id: number;
   question_id: number;
@@ -30,6 +29,7 @@ type IQuestionProps = {
 };
 
 const ExamSubQuestionPage = (props: IQuestionProps) => {
+  const store = useTimeStore();
   const router = useRouter();
   const [value, setValue] = useState<string | number>("1");
 
@@ -139,4 +139,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 (ExamSubQuestionPage as PageWithLayoutType).layout = Exam;
 
-export default inject("dataStore")(observer(ExamSubQuestionPage));
+export default observer(ExamSubQuestionPage);

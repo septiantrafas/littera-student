@@ -2,20 +2,18 @@ import dayjs from "dayjs";
 import React from "react";
 import { useRouter } from "next/router";
 import { GetStaticPaths } from "next";
-import { inject } from "mobx-react";
 import { observer } from "mobx-react-lite";
-import { DataStore } from "@/stores/DataStore";
 
 import Exam from "@/layouts/exam";
 import PageWithLayoutType from "@/types/pageWithLayout";
 import { Box, Button, Text } from "@chakra-ui/react";
+import { useTimeStore } from "providers/RootStoreProvider";
 
 type ICategoryUrl = {
   category: string;
 };
 
 type ICategoryProps = {
-  dataStore?: DataStore;
   title: string;
   description: string;
   start_time: string;
@@ -23,14 +21,14 @@ type ICategoryProps = {
 };
 
 const ExamCategoryPage = (props: ICategoryProps) => {
-  const dataStore = props.dataStore;
+  const store = useTimeStore();
   const router = useRouter();
 
   const start_time = dayjs(props.start_time);
   const end_time = dayjs(props.end_time);
   const duration = end_time.diff(start_time, "minutes");
 
-  dataStore.changeEndTime(end_time.toString());
+  store.changeEndTime(end_time.toString());
 
   return (
     <>
@@ -109,4 +107,4 @@ export async function getStaticProps({ params }) {
 
 (ExamCategoryPage as PageWithLayoutType).layout = Exam;
 
-export default inject("dataStore")(observer(ExamCategoryPage));
+export default observer(ExamCategoryPage);

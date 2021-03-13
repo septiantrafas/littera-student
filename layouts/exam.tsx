@@ -18,7 +18,7 @@ type LayoutProps = {
 const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
   const { colorMode, toggleColorMode } = useColorMode();
   return (
-    <Box bg={mode("white", "gray.800")}>
+    <Box minH="100vh" bg={mode("gray.50", "gray.800")}>
       <Flex
         position="relative"
         justifyContent="space-between"
