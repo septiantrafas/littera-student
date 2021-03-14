@@ -38,34 +38,52 @@ const ExamQuestionPage = (props: IQuestionProps) => {
   const [value, setValue] = useState<string | number>("1");
 
   const instruction_time = dayjs(props.instruction_time);
+
   useEffect(() => {
-    if (dayjs().isBefore(instruction_time)) {
+    const end_time = dayjs(props.end_time);
+    const isCountdownShouldStart =
+      dayjs().isBefore(instruction_time) || dayjs().isBefore(end_time);
+    const hasInstructionTime = instruction_time.isValid();
+
+    // even if instruction is null, it will return a false
+    if (isCountdownShouldStart && hasInstructionTime) {
       store.updateEndTime(props.instruction_time);
     } else {
-      console.log(dayjs().isBefore(instruction_time));
       store.updateEndTime(props.end_time);
     }
   }, []);
 
   useEffect(() => {
-    if (dayjs().isAfter(instruction_time)) {
+    const end_time = dayjs(props.end_time);
+    const isCountdownExpired =
+      dayjs().isAfter(instruction_time) || dayjs().isAfter(end_time);
+    const hasInstructionTime = instruction_time.isValid();
+
+    if (isCountdownExpired && hasInstructionTime) {
       router.push(`/exam/${props.category_id}/${props.id}/1`);
       store.updateEndTime(props.end_time);
+    } else {
+      router.push(getNextCategoryRoute());
     }
   }, [store.END_TIME]);
 
-  function getNextRoute() {
-    const next_question = props.id + 1;
+  function getNextCategoryRoute() {
     const next_category = props.category_id + 1;
+
+    if (props.category_id !== 2) {
+      return `/exam/${next_category}`;
+    } else {
+      return `/exam/lobby`;
+    }
+  }
+
+  function getNextQuestionRoute() {
+    const next_question = props.id + 1;
 
     if (props.id !== props.total_question) {
       return `/exam/${props.category_id}/${next_question}`;
     } else {
-      if (props.category_id !== 7) {
-        return `/exam/${next_category}`;
-      } else {
-        return `/exam/lobby`;
-      }
+      getNextCategoryRoute();
     }
   }
 
@@ -134,7 +152,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
         >
           <Button
             colorScheme="blue"
-            onClick={() => router.push(getNextRoute())}
+            onClick={() => router.push(getNextQuestionRoute())}
           >
             Next
           </Button>
@@ -160,6 +178,21 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
+  const time = () => {
+    if (!results.end_time) {
+      return {
+        instruction: null,
+        start: data.start_time,
+        end: data.end_time,
+      };
+    }
+    return {
+      instruction: results.instruction_time,
+      start: results.start_time,
+      end: results.end_time,
+    };
+  };
+
   let subquestion_route = null;
   if (results.answer.length === 0) {
     subquestion_route = `/exam/${params.category}/${params.question}/1`;
@@ -170,9 +203,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       id: Number(params.question),
       category_id: Number(params.category),
-      instruction_time: results.instruction_time,
-      start_time: results.start_time,
-      end_time: results.end_time,
+      instruction_time: time().instruction,
+      start_time: time().start,
+      end_time: time().end,
       answer: results.answer,
       subquestion_route: subquestion_route,
       question: results.question,
