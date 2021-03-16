@@ -1,0 +1,18 @@
+.sbui-btn-primary {
+  background-color: rgba(37, 99, 235, 1) !important;
+}
+.sbui-btn-primary:hover {
+  background-color: rgba(37, 99, 235, 0.9) !important;
+}
+
+.sbui-btn-primary:focus {
+  background-color: rgba(37, 99, 235, 1) !important;
+}
+
+.sbui-typography-link {
+  color: #2563eb !important;
+}
+
+div.sbui-space-col.sbui-space-y-2 > a.sbui-typography-link:last-child {
+  display: none !important;
+}

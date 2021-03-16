@@ -4,6 +4,9 @@ import PageWithLayoutType from "@/types/pageWithLayout";
 import theme from "../theme";
 import { Chakra } from "../Chakra";
 import { RootStoreProvider } from "../providers/RootStoreProvider";
+import { Auth } from "@supabase/ui";
+import { supabase } from "utils/initSupabase";
+import "styles/supabase.css";
 
 type AppLayoutProps = {
   Component: PageWithLayoutType;
@@ -18,11 +21,13 @@ class MyApp extends App<AppLayoutProps> {
     return (
       <Chakra theme={theme} cookies={pageProps.cookies}>
         <CSSReset />
-        <RootStoreProvider hydrationData={pageProps.hydrationData}>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </RootStoreProvider>
+        <Auth.UserContextProvider supabaseClient={supabase}>
+          <RootStoreProvider hydrationData={pageProps.hydrationData}>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </RootStoreProvider>
+        </Auth.UserContextProvider>
       </Chakra>
     );
   }

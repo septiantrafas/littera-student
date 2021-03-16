@@ -2,10 +2,9 @@ import React from "react";
 import PageWithLayoutType from "@/types/pageWithLayout";
 
 import Authenticated from "@/layouts/authenticated";
-import Default from "@/layouts/default";
-import { LoginForm } from "@/components/LoginForm";
-import { DividerWithText } from "@/components/DividerWithText";
-import { FaFacebook, FaGoogle, FaGithub } from "react-icons/fa";
+import { Auth } from "@supabase/ui";
+import { supabase } from "utils/initSupabase";
+
 import NextLink from "next/link";
 import {
   Box,
@@ -57,22 +56,12 @@ const Signin: React.FC = () => {
         </Box>
         <Box maxW={{ sm: "md" }} mt="8" w={{ sm: "full" }} mx="auto">
           <Box py="8" px={{ base: "4" }} rounded={{ sm: "lg" }}>
-            <LoginForm />
-            <DividerWithText mt="6">Or continue with</DividerWithText>
-            <SimpleGrid mt="6" columns={3} spacing="3">
-              <Button color="currentColor" variant="outline">
-                <VisuallyHidden>Login with Facebook</VisuallyHidden>
-                <FaFacebook />
-              </Button>
-              <Button color="currentColor" variant="outline">
-                <VisuallyHidden>Login with Google</VisuallyHidden>
-                <FaGoogle />
-              </Button>
-              <Button color="currentColor" variant="outline">
-                <VisuallyHidden>Login with Github</VisuallyHidden>
-                <FaGithub />
-              </Button>
-            </SimpleGrid>
+            <Auth
+              supabaseClient={supabase}
+              view="sign_in"
+              socialLayout="horizontal"
+              socialButtonSize="xlarge"
+            />
           </Box>
         </Box>
       </Box>
