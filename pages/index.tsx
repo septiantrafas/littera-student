@@ -4,6 +4,7 @@ import NextLink from "next/link";
 import PageWithLayoutType from "@/types/pageWithLayout";
 import Default from "@/layouts/default";
 import { Flex, Heading, chakra, Text, Link } from "@chakra-ui/react";
+import { GetServerSideProps } from "next";
 
 const Home: React.FC = () => {
   return (
