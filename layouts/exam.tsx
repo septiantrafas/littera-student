@@ -18,15 +18,16 @@ type LayoutProps = {
 const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
   const { colorMode, toggleColorMode } = useColorMode();
   return (
-    <Box minH="100vh" bg={mode("gray.50", "gray.800")}>
+    <Box height="100vh" bg={mode("white", "trueGray.900")}>
       <Flex
+        bg={mode("white", "trueGray.800")}
         position="relative"
+        boxShadow="base"
         justifyContent="space-between"
         alignItems="center"
         direction="row"
         p="4"
-        borderBottom="1px"
-        borderColor={mode("gray.200", "transparent")}
+        borderBottomWidth="1px"
       >
         <Logo h="6" iconColor={mode("gray.900", "gray.200")} />
         <Flex alignItems="center">
