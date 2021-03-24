@@ -21,6 +21,11 @@ export function useTimeStore() {
   return timeStore;
 }
 
+export function useNavigationStore() {
+  const { navigationStore } = useRootStore();
+  return navigationStore;
+}
+
 export function RootStoreProvider({
   children,
   hydrationData,
