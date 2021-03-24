@@ -21,8 +21,8 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
     <Box height="100vh" bg={mode("white", "trueGray.900")}>
       <Flex
         bg={mode("white", "trueGray.800")}
+        boxShadow="sm"
         position="relative"
-        boxShadow="base"
         justifyContent="space-between"
         alignItems="center"
         direction="row"

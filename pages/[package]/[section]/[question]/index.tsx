@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import React, { useState } from "react";
 
 import PageWithLayoutType from "@/types/pageWithLayout";
 import QuestionNavigator from "@/components/QuestionNavigator";
@@ -7,7 +6,6 @@ import Exam from "@/layouts/exam";
 
 import {
   Box,
-  Button,
   Radio,
   RadioGroup,
   useColorModeValue as mode,
@@ -18,8 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { observer } from "mobx-react";
 import { supabase } from "utils/initSupabase";
-import { GetServerSideProps, GetStaticPaths, GetStaticPropsResult } from "next";
-import { useNavigationStore, useRootStore } from "providers/RootStoreProvider";
+import { GetServerSideProps } from "next";
 
 type IQuestionsPath = {
   id: number;
@@ -52,6 +49,7 @@ type IQuestionProps = {
 
 const ExamQuestionPage = (props: IQuestionProps) => {
   const [value, setValue] = useState<string | number>("1");
+
   const isSelected = (item) => {
     return value === item;
   };
@@ -59,7 +57,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
   return (
     <Flex height="95vh" justifyContent="center">
       <Box
-        boxShadow="lg"
+        boxShadow="2xl"
         position="relative"
         w="100%"
         px="10"
@@ -67,7 +65,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
         overflow="scroll"
       >
         <Box maxW={{ xl: "2xl", "2xl": "3xl" }} mx="auto">
-          <Text fontSize="lg" fontWeight="semibold">
+          <Text fontSize="xl" fontWeight="semibold">
             {props.number}. {props.question}
           </Text>
           <RadioGroup
@@ -75,16 +73,15 @@ const ExamQuestionPage = (props: IQuestionProps) => {
             value={value}
             mt="10"
           >
-            <Stack direction="column" spacing="4">
+            <Stack direction="column" spacing="5">
               {props.options.map((item, index) => (
                 <Box
                   px="6"
                   key={item}
                   d="flex"
-                  minH="100px"
                   cursor="pointer"
                   borderWidth="1px"
-                  borderRadius="lg"
+                  borderRadius="xl"
                   bg={
                     isSelected(item)
                       ? mode("blue.50", "gray.800")
@@ -111,25 +108,25 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                   }}
                 >
                   <Text
-                    fontSize="2xl"
-                    fontWeight="semibold"
+                    fontSize="5xl"
+                    fontWeight="bold"
                     textColor={
                       isSelected(item)
-                        ? mode("blue.600", "blue.400")
-                        : "GrayText"
+                        ? mode("blue.100", "blue.400")
+                        : mode("gray.100", "gray.400")
                     }
                     my="auto"
-                    mx="2"
                     textTransform="uppercase"
                   >
                     {String.fromCharCode("a".charCodeAt(0) + index)}
                   </Text>
                   <Divider
-                    mx="3"
+                    mx="4"
+                    height="100%"
                     borderColor={mode("gray.200", "gray.700")}
                     orientation="vertical"
                   />
-                  <Radio value={item} hidden>
+                  <Radio my="10" value={item} hidden>
                     {item}
                   </Radio>
                 </Box>
@@ -180,6 +177,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   }));
 
+  const position = paths.findIndex(
+    (arr) => arr.params.question.id === context.params.question.toString()
+  );
+
+  const next_path = paths[position + 1] ? paths[position + 1] : null;
+  const previous_path = paths[position - 1] ? paths[position - 1] : null;
+
   const res = await supabase
     .from<IQuestionsResponse>("questions")
     .select("*")
@@ -193,7 +197,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       hydrationData: {
         navigationStore: {
-          paths: paths,
+          paths,
+          next_path,
+          previous_path,
         },
       },
       id: data.id,

@@ -6,21 +6,17 @@ import {
   useColorModeValue as mode,
   Badge,
   Flex,
-  IconButton,
 } from "@chakra-ui/react";
 import * as React from "react";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
 import { useNavigationStore } from "providers/RootStoreProvider";
 import { observer } from "mobx-react";
-import {
-  HiArrowLeft,
-  HiArrowRight,
-  HiChevronLeft,
-  HiChevronRight,
-} from "react-icons/hi";
+import { HiArrowLeft, HiArrowRight } from "react-icons/hi";
 
 function QuestionNavigator() {
+  const store = useNavigationStore();
+
   return (
     <>
       <Box h="full">
@@ -87,21 +83,55 @@ function QuestionNavigator() {
           alignItems="flex-end"
           justifyContent="space-between"
         >
-          <Button
-            variant="link"
-            textColor="gray.600"
-            leftIcon={<HiArrowLeft />}
+          <NextLink
+            href={
+              store.previous_path
+                ? {
+                    pathname: "/[package]/[section]/[question]",
+                    query: {
+                      package: store.previous_path.params.package,
+                      section: store.previous_path.params.section,
+                      question: store.previous_path.params.question.id,
+                    },
+                  }
+                : ""
+            }
           >
-            Back
-          </Button>
+            <Button
+              variant="link"
+              p="2"
+              textColor="gray.600"
+              leftIcon={<HiArrowLeft />}
+              isDisabled={!store.previous_path}
+            >
+              Back
+            </Button>
+          </NextLink>
 
-          <Button
-            variant="link"
-            textColor="gray.600"
-            rightIcon={<HiArrowRight />}
+          <NextLink
+            href={
+              store.next_path
+                ? {
+                    pathname: "/[package]/[section]/[question]",
+                    query: {
+                      package: store.next_path.params.package,
+                      section: store.next_path.params.section,
+                      question: store.next_path.params.question.id,
+                    },
+                  }
+                : ""
+            }
           >
-            Next
-          </Button>
+            <Button
+              variant="link"
+              p="2"
+              textColor="gray.600"
+              rightIcon={<HiArrowRight />}
+              isDisabled={!store.next_path}
+            >
+              Next
+            </Button>
+          </NextLink>
         </Flex>
       </Box>
     </>
@@ -117,7 +147,7 @@ function QuestionGrid() {
         const isActive = path.params.question.id === router.query.question;
         return (
           <NextLink
-            key={index}
+            key={path.params.question.number}
             href={{
               pathname: "/[package]/[section]/[question]",
               query: {
@@ -130,7 +160,7 @@ function QuestionGrid() {
             <Button
               type="submit"
               variant={isActive ? "solid" : "outline"}
-              colorScheme={isActive ? "facebook" : mode("blackAlpha", "gray")}
+              colorScheme={isActive ? "lightBlue" : mode("warmGray", "gray")}
               boxShadow="none"
               size="md"
               fontSize="md"

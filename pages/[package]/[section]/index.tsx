@@ -102,7 +102,6 @@ export const getStaticPaths: GetStaticPaths<ISectionUrl> = async () => {
       section: section.id.toString(),
     },
   }));
-  console.log(paths);
   return {
     paths,
     fallback: false,
@@ -118,7 +117,6 @@ export const getStaticProps = async ({
     .match({ id: params.section })
     .single();
   const data = res.data;
-  console.log(res);
 
   // Pass data to the page via props
   return {
