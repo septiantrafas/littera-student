@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import PageWithLayoutType from "@/types/pageWithLayout";
 import QuestionNavigator from "@/components/QuestionNavigator";
@@ -17,6 +17,7 @@ import {
 import { observer } from "mobx-react";
 import { supabase } from "utils/initSupabase";
 import { GetServerSideProps } from "next";
+import { useNavigationStore } from "providers/RootStoreProvider";
 
 type IQuestionsPath = {
   id: number;
@@ -49,10 +50,18 @@ type IQuestionProps = {
 
 const ExamQuestionPage = (props: IQuestionProps) => {
   const [value, setValue] = useState<string | number>("1");
+  const store = useNavigationStore();
 
   const isSelected = (item) => {
     return value === item;
   };
+
+  useEffect(() => {
+    const position = store.paths.findIndex(
+      (arr) => arr.params.question.id === props.id
+    );
+    store.addToVisitedIndex(position);
+  }, [store.paths, store.VISITED_INDEX]);
 
   return (
     <Flex height="95vh" justifyContent="center">

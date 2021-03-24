@@ -13,9 +13,11 @@ import NextLink from "next/link";
 import { useNavigationStore } from "providers/RootStoreProvider";
 import { observer } from "mobx-react";
 import { HiArrowLeft, HiArrowRight } from "react-icons/hi";
+import { useEffect } from "react";
 
 function QuestionNavigator() {
   const store = useNavigationStore();
+  const router = useRouter();
 
   return (
     <>
@@ -160,7 +162,21 @@ function QuestionGrid() {
             <Button
               type="submit"
               variant={isActive ? "solid" : "outline"}
-              colorScheme={isActive ? "lightBlue" : mode("warmGray", "gray")}
+              borderRadius="lg"
+              borderColor={
+                isActive ? "transparent" : mode("gray.300", "gray.800")
+              }
+              bgColor={
+                store.isVisited(index) && !isActive
+                  ? mode("gray.200", "gray.800")
+                  : isActive
+                  ? mode("blue.600", "blue.800")
+                  : "transparent"
+              }
+              textColor={isActive ? "white" : mode("gray.500", "gray.500")}
+              _hover={{
+                bgColor: isActive ? "blue.600" : "gray.100",
+              }}
               boxShadow="none"
               size="md"
               fontSize="md"

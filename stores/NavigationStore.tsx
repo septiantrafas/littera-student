@@ -21,11 +21,13 @@ export type PathsHydration = {
   paths?: [];
   next_path?: Paths;
   previous_path?: Paths;
+  visited_index?: [];
 };
 
 export class NavigationStore {
   root: RootStore;
   PATHS: Paths[];
+  VISITED_INDEX: number[] = [];
   NEXT_PATH: Paths;
   PREVIOUS_PATH: Paths;
 
@@ -62,5 +64,19 @@ export class NavigationStore {
 
   set previous_path(value) {
     this.PREVIOUS_PATH = value;
+  }
+
+  isVisited(index: number) {
+    if (this.VISITED_INDEX) {
+      return this.VISITED_INDEX.includes(index);
+    } else {
+      return false;
+    }
+  }
+
+  addToVisitedIndex(index: number) {
+    if (!this.isVisited(index)) {
+      this.VISITED_INDEX.push(index);
+    }
   }
 }
