@@ -7,6 +7,7 @@ import { RootStoreProvider } from "../providers/RootStoreProvider";
 import { Auth } from "@supabase/ui";
 import { supabase } from "utils/initSupabase";
 import "styles/supabase.css";
+import "styles/global.css";
 
 type AppLayoutProps = {
   Component: PageWithLayoutType;
