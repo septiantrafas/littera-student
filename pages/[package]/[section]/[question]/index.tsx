@@ -49,110 +49,125 @@ type IQuestionProps = {
 };
 
 const ExamQuestionPage = (props: IQuestionProps) => {
-  const [value, setValue] = useState<string | number>("1");
   const store = useNavigationStore();
-
-  const isSelected = (item) => {
-    return value === item;
-  };
-
   useEffect(() => {
     const position = store.paths.findIndex(
       (arr) => arr.params.question.id === props.id
     );
-    store.addToVisitedIndex(position);
-  }, [store.paths, store.VISITED_INDEX]);
+    const number = store.paths[position].params.question.number;
+    store.addToVisitedIndex(number);
+    console.log(JSON.stringify(store.VISITED_INDEX));
+  }, [store.paths, props.id]);
 
   return (
     <Flex height="95vh" justifyContent="center">
       <Box
-        boxShadow="2xl"
         position="relative"
         w="100%"
         px="10"
         py="12"
         overflow="scroll"
+        bg={mode("white", "trueGray.800")}
       >
         <Box maxW={{ xl: "2xl", "2xl": "3xl" }} mx="auto">
           <Text fontSize="xl" fontWeight="semibold">
             {props.number}. {props.question}
           </Text>
           <RadioGroup
-            onChange={(string) => setValue(string)}
-            value={value}
+            onChange={(value: number) =>
+              store.setAnsweredIndex({
+                question_id: props.id,
+                option_id: value,
+              })
+            }
+            value={store.getSelectedOption(props.id)}
             mt="10"
           >
             <Stack direction="column" spacing="5">
-              {props.options.map((item, index) => (
-                <Box
-                  px="6"
-                  key={item}
-                  d="flex"
-                  cursor="pointer"
-                  borderWidth="1px"
-                  borderRadius="xl"
-                  bg={
-                    isSelected(item)
-                      ? mode("blue.50", "gray.800")
-                      : mode("white", "gray.800")
-                  }
-                  color={
-                    isSelected(item)
-                      ? mode("blue.800", "gray.200")
-                      : mode("gray.800", "gray.200")
-                  }
-                  fontWeight={isSelected(item) ? "medium" : "base"}
-                  boxShadow={isSelected(item) ? "outline" : "sm"}
-                  _hover={{
-                    boxShadow: isSelected(item) ? "outline" : "md",
-                    transform: "translateY(-2px)",
-                  }}
-                  borderColor={
-                    isSelected(item) ? "blue.600" : mode("gray.200", "gray.700")
-                  }
-                  onClick={() => setValue(item)}
-                  style={{
-                    WebkitTransition: "box-shadow 250ms, transform 200ms",
-                    transition: "box-shadow 250ms, transform 200ms",
-                  }}
-                >
-                  <Text
-                    fontSize="5xl"
-                    fontWeight="bold"
-                    textColor={
-                      isSelected(item)
-                        ? mode("blue.100", "blue.400")
-                        : mode("gray.100", "gray.400")
+              {props.options.map((item, index) => {
+                const number = index + 1;
+                const isItemSelected =
+                  store.getSelectedOption(props.id) === number;
+                return (
+                  <Box
+                    px="6"
+                    key={number}
+                    d="flex"
+                    cursor="pointer"
+                    borderWidth="1px"
+                    borderRadius="xl"
+                    bg={
+                      isItemSelected
+                        ? mode("blue.50", "gray.800")
+                        : mode("white", "gray.800")
                     }
-                    my="auto"
-                    textTransform="uppercase"
+                    color={
+                      isItemSelected
+                        ? mode("blue.800", "gray.200")
+                        : mode("gray.800", "gray.200")
+                    }
+                    fontWeight={isItemSelected ? "medium" : "base"}
+                    boxShadow={isItemSelected ? "outline" : "sm"}
+                    _hover={{
+                      boxShadow: isItemSelected ? "outline" : "base",
+                      transform: "translateY(-2px)",
+                    }}
+                    borderColor={
+                      isItemSelected ? "blue.600" : mode("gray.200", "gray.700")
+                    }
+                    onClick={() =>
+                      store.setAnsweredIndex({
+                        question_id: props.id,
+                        option_id: number,
+                      })
+                    }
+                    style={{
+                      WebkitTransition: "box-shadow 250ms, transform 200ms",
+                      transition: "box-shadow 250ms, transform 200ms",
+                    }}
                   >
-                    {String.fromCharCode("a".charCodeAt(0) + index)}
-                  </Text>
-                  <Divider
-                    mx="4"
-                    height="100%"
-                    borderColor={mode("gray.200", "gray.700")}
-                    orientation="vertical"
-                  />
-                  <Radio my="10" value={item} hidden>
-                    {item}
-                  </Radio>
-                </Box>
-              ))}
+                    <Text
+                      fontSize="5xl"
+                      fontWeight="bold"
+                      textColor={
+                        isItemSelected
+                          ? mode("blue.100", "blue.400")
+                          : mode("gray.100", "gray.400")
+                      }
+                      my="auto"
+                      mr="6"
+                      textTransform="uppercase"
+                    >
+                      {String.fromCharCode("a".charCodeAt(0) + index)}
+                    </Text>
+                    <Radio
+                      my="10"
+                      value={number}
+                      cursor="pointer"
+                      onClick={() =>
+                        store.setAnsweredIndex({
+                          question_id: props.id,
+                          option_id: number,
+                        })
+                      }
+                      hidden
+                    >
+                      {item}
+                    </Radio>
+                  </Box>
+                );
+              })}
             </Stack>
           </RadioGroup>
         </Box>
       </Box>
       <Divider orientation="vertical" />
       <Box
-        w={{ xl: "40%", "2xl": "30%" }}
+        w={{ xl: "30%", "2xl": "25%" }}
         bg={mode("gray.50", "trueGray.900")}
-        px="10"
-        py="10"
         justifyContent="space-between"
       >
-        <QuestionNavigator />
+        <QuestionNavigator id={props.id} />
       </Box>
     </Flex>
   );

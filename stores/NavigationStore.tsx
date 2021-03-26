@@ -6,7 +6,7 @@ const isServer = typeof window === "undefined";
 // eslint-disable-next-line react-hooks/rules-of-hooks
 enableStaticRendering(isServer);
 
-type Paths = {
+export type Paths = {
   params: {
     package: string;
     section: string;
@@ -15,6 +15,11 @@ type Paths = {
       number: number;
     };
   };
+};
+
+type AnsweredIndex = {
+  question_id: string;
+  option_id: number;
 };
 
 export type PathsHydration = {
@@ -28,6 +33,7 @@ export class NavigationStore {
   root: RootStore;
   PATHS: Paths[];
   VISITED_INDEX: number[] = [];
+  ANSWERED_INDEX: AnsweredIndex[] = [];
   NEXT_PATH: Paths;
   PREVIOUS_PATH: Paths;
 
@@ -67,16 +73,46 @@ export class NavigationStore {
   }
 
   isVisited(index: number) {
-    if (this.VISITED_INDEX) {
-      return this.VISITED_INDEX.includes(index);
-    } else {
-      return false;
-    }
+    return this.VISITED_INDEX.includes(index);
   }
 
   addToVisitedIndex(index: number) {
     if (!this.isVisited(index)) {
       this.VISITED_INDEX.push(index);
+    }
+  }
+
+  isAnswered(question_id: string) {
+    if (this.ANSWERED_INDEX) {
+      const location = this.ANSWERED_INDEX.findIndex(
+        (arr) => arr.question_id === question_id
+      );
+      return location >= 0;
+    } else {
+      return false;
+    }
+  }
+
+  setAnsweredIndex(index: AnsweredIndex) {
+    console.log(JSON.stringify(this.ANSWERED_INDEX));
+    if (!this.isAnswered(index.question_id)) {
+      this.ANSWERED_INDEX.push(index);
+    } else {
+      const location = this.ANSWERED_INDEX.findIndex(
+        (arr) => arr.question_id === index.question_id
+      );
+      this.ANSWERED_INDEX[location].option_id = index.option_id;
+    }
+  }
+
+  getSelectedOption(question_id: string): number {
+    if (!this.isAnswered(question_id)) {
+      return 0;
+    } else {
+      const location = this.ANSWERED_INDEX.findIndex(
+        (arr) => arr.question_id === question_id
+      );
+      return this.ANSWERED_INDEX[location].option_id;
     }
   }
 }
