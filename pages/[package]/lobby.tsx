@@ -3,7 +3,7 @@ import Head from "next/head";
 import React from "react";
 import PageWithLayoutType from "@/types/pageWithLayout";
 
-import Exam from "@/layouts/exam";
+import Default from "@/layouts/default";
 import { Box, Flex, Progress, Spinner, Text } from "@chakra-ui/react";
 import { HiOutlineExclamation } from "react-icons/hi";
 
@@ -46,6 +46,6 @@ const Lobby: React.FC = () => {
   );
 };
 
-(Lobby as PageWithLayoutType).layout = Exam;
+(Lobby as PageWithLayoutType).layout = Default;
 
 export default Lobby;

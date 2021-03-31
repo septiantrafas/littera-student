@@ -8,14 +8,20 @@ import {
 import { enableStaticRendering } from "mobx-react";
 import { RootStore } from "@/stores/RootStore";
 import { io } from "socket.io-client";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
+import duration from "dayjs/plugin/duration";
+
+dayjs.extend(duration);
 
 const isServer = typeof window === "undefined";
 // eslint-disable-next-line react-hooks/rules-of-hooks
 enableStaticRendering(isServer);
 
 export type TimeHydration = {
-  time: string;
+  time?: string;
+  start_time?: string;
+  end_time?: string;
+  timeout_path?: [];
 };
 
 export class TimeStore {
@@ -23,6 +29,7 @@ export class TimeStore {
   TIME: string | undefined;
   START_TIME: string | undefined;
   END_TIME: string | undefined;
+  TIMEOUT_PATH: {};
 
   constructor(root: RootStore) {
     this.root = root;
@@ -30,7 +37,13 @@ export class TimeStore {
   }
 
   hydrate(data: TimeHydration) {
-    this.TIME = data.time != null ? data.time : "";
+    // do not hydrate if TIME exists
+    if (!this.TIME) {
+      this.TIME = data.time != null ? data.time : "";
+    }
+    this.START_TIME = data.start_time != null ? data.start_time : "";
+    this.END_TIME = data.end_time != null ? data.end_time : "";
+    this.TIMEOUT_PATH = data.timeout_path != null ? data.timeout_path : {};
   }
 
   updateTime(value: string) {
@@ -43,5 +56,20 @@ export class TimeStore {
 
   updateEndTime(value: string) {
     this.END_TIME = value;
+  }
+
+  calculateTimeLeft(time: string) {
+    const now = dayjs(time);
+    const end_time = dayjs(this.END_TIME);
+
+    if (now.isBefore(end_time)) {
+      const time_difference = dayjs(
+        end_time.toDate().getTime() - now.toDate().getTime()
+      ).utcOffset(0);
+
+      return time_difference;
+    } else {
+      return dayjs(0);
+    }
   }
 }

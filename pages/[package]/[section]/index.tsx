@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/router";
 import { GetStaticPaths, GetStaticPropsResult } from "next";
 import { observer } from "mobx-react-lite";
@@ -7,22 +7,36 @@ import { observer } from "mobx-react-lite";
 import Exam from "@/layouts/exam";
 import PageWithLayoutType from "@/types/pageWithLayout";
 import { Box, Button, Text } from "@chakra-ui/react";
-import { useTimeStore } from "providers/RootStoreProvider";
+import { useNavigationStore, useTimeStore } from "providers/RootStoreProvider";
 import { supabase } from "utils/initSupabase";
 
 type IStaticPath = {
-  id: number;
-  packages: { id: number };
+  id: string;
+  packages: { id: string };
+};
+
+type ISectionsPath = {
+  id: string;
+  sections: {
+    id: string;
+    number: number;
+    packages: {
+      id: string;
+    };
+  };
 };
 
 type ISectionResponse = {
-  id: number;
-  package_id: number;
+  id: string;
   number: number;
-  titles: string;
-  context: string;
-  start_time: string;
-  end_time: string;
+  sections: {
+    id: string;
+    number: number;
+    titles: string;
+    context: string;
+    start_time: string;
+    end_time: string;
+  };
 };
 
 type ISectionUrl = {
@@ -30,8 +44,17 @@ type ISectionUrl = {
 };
 
 type ISectionProps = {
-  id: number;
-  package_id: number;
+  hydrationData: {
+    navigationStore: {
+      next_path;
+    };
+    timeStore: {
+      time: string;
+      start_time: string;
+      end_time: string;
+    };
+  };
+  id: string;
   number: number;
   title: string;
   context: string;
@@ -41,13 +64,12 @@ type ISectionProps = {
 
 const ExamCategoryPage = (props: ISectionProps) => {
   const store = useTimeStore();
+  const navigation = useNavigationStore();
   const router = useRouter();
 
   const start_time = dayjs(props.start_time);
   const end_time = dayjs(props.end_time);
   const duration = end_time.diff(start_time, "minutes");
-
-  store.updateEndTime(end_time.toString());
 
   return (
     <>
@@ -70,25 +92,27 @@ const ExamCategoryPage = (props: ISectionProps) => {
           Contoh Soal
         </Text>
         <Text>{props.context}</Text>
-        {/* <Button
+        <Button
           mt="6"
           onClick={() =>
             router.push({
               pathname: "/[package]/[section]/[question]",
-              query: { category: router.query.section, question: 1 },
+              query: {
+                package: navigation.next_path.params.package,
+                section: navigation.next_path.params.section,
+                question: navigation.next_path.params.question.id,
+              },
             })
           }
         >
           Start
-        </Button> */}
+        </Button>
       </Box>
     </>
   );
 };
 
 export const getStaticPaths: GetStaticPaths<ISectionUrl> = async () => {
-  // const routes = await generateRoutes();
-  // console.log(routes);
   const query = `
     id,
     packages:package_id ( id ) 
@@ -98,10 +122,11 @@ export const getStaticPaths: GetStaticPaths<ISectionUrl> = async () => {
   const res = await supabase.from<IStaticPath>("sections").select(query);
   const paths = res.data.map((section) => ({
     params: {
-      package: section.packages.id.toString(),
-      section: section.id.toString(),
+      package: section.packages.id,
+      section: section.id,
     },
   }));
+
   return {
     paths,
     fallback: false,
@@ -111,23 +136,85 @@ export const getStaticPaths: GetStaticPaths<ISectionUrl> = async () => {
 export const getStaticProps = async ({
   params,
 }): Promise<GetStaticPropsResult<ISectionProps>> => {
-  const res = await supabase
-    .from<ISectionResponse>("sections")
-    .select("*")
-    .match({ id: params.section })
-    .single();
-  const data = res.data;
+  const query = `
+  id,
+  number,
+  packages:package_id ( id ) 
+  )`;
 
+  const path_res = await supabase
+    .from<any>("sections")
+    .select(query)
+    .match({ package_id: params.package })
+    .order("number", { ascending: true });
+
+  const paths = path_res.data.map((data) => ({
+    params: {
+      package: data.packages.id.toString(),
+      section: data.id.toString(),
+    },
+  }));
+
+  const position = paths.findIndex(
+    (arr) => arr.params.section === params.section
+  );
+
+  const next_section = paths[position + 1] ? paths[position + 1].params : null;
+  const next_section_url = next_section
+    ? {
+        package: next_section.package,
+        section: next_section.section,
+      }
+    : {
+        package: params.package,
+        section: "lobby",
+      };
+
+  const res = await supabase
+    .from<ISectionResponse>("questions")
+    .select("id, number, sections:section_id (*)")
+    .match({ section_id: params.section })
+    .order("number", { ascending: true })
+    .limit(1);
+
+  const data = res.data[0];
+  const sections = data.sections;
+
+  const next_path = {
+    params: {
+      package: params.package,
+      section: params.section,
+      question: {
+        id: data.id,
+        number: data.number,
+      },
+    },
+  };
+
+  const getTime = await fetch("http://localhost:3000/api/time");
+  const time = await getTime.json().then((res) => res.time);
+
+  const hydrationData = {
+    navigationStore: {
+      next_path,
+    },
+    timeStore: {
+      time,
+      start_time: sections.start_time,
+      end_time: sections.end_time,
+      timeout_path: next_section_url,
+    },
+  };
   // Pass data to the page via props
   return {
     props: {
-      id: data.id,
-      package_id: data.package_id,
-      number: data.number,
-      title: data.titles,
-      context: data.context,
-      start_time: data.start_time,
-      end_time: data.end_time,
+      hydrationData,
+      id: sections.id,
+      number: sections.number,
+      title: sections.titles,
+      context: sections.context,
+      start_time: sections.start_time,
+      end_time: sections.end_time,
     },
   };
 };

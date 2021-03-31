@@ -17,13 +17,19 @@ import {
 import { observer } from "mobx-react";
 import { supabase } from "utils/initSupabase";
 import { GetServerSideProps } from "next";
-import { useNavigationStore } from "providers/RootStoreProvider";
+import { useNavigationStore, useTimeStore } from "providers/RootStoreProvider";
+import { useRouter } from "next/router";
 
 type IQuestionsPath = {
-  id: number;
+  id: string;
   number: number;
   section_id: string;
-  sections: { id: number; packages: { id: number } };
+  sections: {
+    id: string;
+    start_time: string;
+    end_time: string;
+    packages: { id: number };
+  };
 };
 
 type IQuestionsResponse = {
@@ -50,13 +56,27 @@ type IQuestionProps = {
 
 const ExamQuestionPage = (props: IQuestionProps) => {
   const store = useNavigationStore();
+  const time = useTimeStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!time.END_TIME) {
+      router.push({
+        pathname: "/[package]/[section]",
+        query: {
+          package: router.query.package,
+          section: router.query.section,
+        },
+      });
+    }
+  }, [time.END_TIME]);
+
   useEffect(() => {
     const position = store.paths.findIndex(
       (arr) => arr.params.question.id === props.id
     );
     const number = store.paths[position].params.question.number;
     store.addToVisitedIndex(number);
-    console.log(JSON.stringify(store.VISITED_INDEX));
   }, [store.paths, props.id]);
 
   return (
@@ -180,6 +200,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   section_id, 
     sections:section_id (
         id,
+        start_time,
+        end_time,
         packages:package_id ( id ) 
     )
   `;
@@ -216,16 +238,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const data = res.data;
 
+  const hydrationData = {
+    navigationStore: {
+      paths,
+      next_path,
+      previous_path,
+    },
+  };
   // Pass data to the page via props
   return {
     props: {
-      hydrationData: {
-        navigationStore: {
-          paths,
-          next_path,
-          previous_path,
-        },
-      },
+      hydrationData,
       id: data.id,
       section_id: data.section_id,
       number: data.number,
