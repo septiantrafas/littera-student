@@ -21,7 +21,10 @@ export type TimeHydration = {
   time?: string;
   start_time?: string;
   end_time?: string;
-  timeout_path?: [];
+  timeout_path?: {
+    package: string;
+    section: string;
+  };
 };
 
 export class TimeStore {
@@ -29,7 +32,10 @@ export class TimeStore {
   TIME: string | undefined;
   START_TIME: string | undefined;
   END_TIME: string | undefined;
-  TIMEOUT_PATH: {};
+  TIMEOUT_PATH: {
+    package: string;
+    section: string;
+  } | null;
 
   constructor(root: RootStore) {
     this.root = root;
@@ -43,7 +49,7 @@ export class TimeStore {
     }
     this.START_TIME = data.start_time != null ? data.start_time : "";
     this.END_TIME = data.end_time != null ? data.end_time : "";
-    this.TIMEOUT_PATH = data.timeout_path != null ? data.timeout_path : {};
+    this.TIMEOUT_PATH = data.timeout_path != null ? data.timeout_path : null;
   }
 
   updateTime(value: string) {
