@@ -43,13 +43,27 @@ export class TimeStore {
   }
 
   hydrate(data: TimeHydration) {
+    const isProduction = process.env.NODE_ENV === "production";
+    const isDevelopment = process.env.NODE_ENV === "development";
+
+    if (isDevelopment) {
+      if (!this.TIME) {
+        this.TIME = dayjs().toISOString();
+      }
+      this.START_TIME = dayjs().subtract(1, "minute").toISOString();
+      this.END_TIME = dayjs().add(2, "minute").toISOString();
+    }
+
     // do not hydrate if TIME exists
-    if (!this.TIME) {
+    if (!this.TIME && isProduction) {
       this.TIME = data.time != null ? data.time : "";
     }
-    this.START_TIME = data.start_time != null ? data.start_time : "";
-    this.END_TIME = data.end_time != null ? data.end_time : "";
-    this.TIMEOUT_PATH = data.timeout_path != null ? data.timeout_path : null;
+
+    if (isProduction) {
+      this.START_TIME = data.start_time != null ? data.start_time : "";
+      this.END_TIME = data.end_time != null ? data.end_time : "";
+      this.TIMEOUT_PATH = data.timeout_path != null ? data.timeout_path : null;
+    }
   }
 
   updateTime(value: string) {
