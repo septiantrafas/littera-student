@@ -41,9 +41,11 @@ const Home: React.FC<IHomeProps> = ({ paths }) => {
           </NextLink>
         </Text>
 
-        <Box p="4" mt="10" borderWidth="1px" borderRadius="md">
-          <Text>List of all packages:</Text>
-          {paths.map((path) => (
+        <Text mt="10" mb="2">
+          List of all packages:
+        </Text>
+        {paths.map((path) => (
+          <Box p="4" key={path.package.id} borderWidth="1px" borderRadius="md">
             <NextLink
               href={{
                 pathname: "/[package]/[section]",
@@ -55,8 +57,8 @@ const Home: React.FC<IHomeProps> = ({ paths }) => {
             >
               <Link color="cyan.500">{path.package.id}</Link>
             </NextLink>
-          ))}
-        </Box>
+          </Box>
+        ))}
       </Flex>
     </div>
   );

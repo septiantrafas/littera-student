@@ -4,21 +4,13 @@ import Head from "next/head";
 import React from "react";
 import PageWithLayoutType from "@/types/pageWithLayout";
 
-import Exam from "@/layouts/exam";
+import Default from "@/layouts/default";
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
   Avatar,
   AvatarBadge,
   Box,
-  CloseButton,
   Flex,
-  Img,
   Link,
-  Progress,
-  Spinner,
   Stack,
   Text,
 } from "@chakra-ui/react";
@@ -85,6 +77,6 @@ const Permission: React.FC = () => {
   );
 };
 
-(Permission as PageWithLayoutType).layout = Exam;
+(Permission as PageWithLayoutType).layout = Default;
 
 export default Permission;

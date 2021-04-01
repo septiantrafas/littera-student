@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { Logo } from "@/components/Logo";
 import { HiMoon, HiSun } from "react-icons/hi";
+import { useRouter } from "next/router";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -17,6 +18,7 @@ type LayoutProps = {
 
 const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
   const { colorMode, toggleColorMode } = useColorMode();
+  const router = useRouter();
   return (
     <Box bg={mode("white", "gray.800")}>
       <Flex
@@ -28,13 +30,12 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
         borderBottom="1px"
         borderColor={mode("gray.200", "transparent")}
       >
-        <NextLink href="/">
-          <Logo
-            h="6"
-            iconColor={mode("gray.900", "gray.200")}
-            cursor="pointer"
-          />
-        </NextLink>
+        <Logo
+          onClick={() => router.push("/")}
+          h="6"
+          iconColor={mode("gray.900", "gray.200")}
+          cursor="pointer"
+        />
         <IconButton
           aria-label={
             colorMode === "light" ? "Toggle dark mode" : "Toggle light mode"
