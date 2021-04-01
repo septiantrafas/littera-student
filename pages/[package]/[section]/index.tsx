@@ -9,6 +9,9 @@ import PageWithLayoutType from "@/types/pageWithLayout";
 import { Box, Button, Text } from "@chakra-ui/react";
 import { useNavigationStore, useTimeStore } from "providers/RootStoreProvider";
 import { supabase } from "utils/initSupabase";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(timezone);
 
 type IStaticPath = {
   id: string;
@@ -191,8 +194,7 @@ export const getStaticProps = async ({
     },
   };
 
-  const getTime = await fetch("http://localhost:3000/api/time");
-  const time = await getTime.json().then((res) => res.time);
+  const time = dayjs().tz("Asia/Jakarta").toISOString();
 
   const hydrationData = {
     navigationStore: {
