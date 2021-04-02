@@ -97,6 +97,7 @@ const ExamCategoryPage = (props: ISectionProps) => {
         <Text>{props.context}</Text>
         <Button
           mt="6"
+          data-cy="start-button"
           onClick={() =>
             router.push({
               pathname: "/[package]/[section]/[question]",

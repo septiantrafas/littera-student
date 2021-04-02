@@ -75,6 +75,7 @@ export const TimeKeeper = observer(() => {
           fontSize="sm"
           ml="2"
           color={mode("gray.400", "gray.400")}
+          data-cy="timer-text"
         >
           00:00:00
         </Text>
