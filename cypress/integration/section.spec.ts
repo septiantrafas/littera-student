@@ -1,35 +1,56 @@
-describe('Section page', () => {
-    // For desktop view
-    context('720p resolution', () => {
-        beforeEach(() => {
-            /**
-             * Run these tests as if in a desktop browser,
-             * with a 720p monitor
-             */
-            cy.viewport(1280, 720)
-        })
-        describe('When you visit home', () => {
-            it('Should visit home page', () => {
-                cy.visit('/')
-            });
-            describe('Link for accessing packages', () => {
-                it('Should navigate to the first sections of the package', () => {
-                    cy.get('[data-cy=package-link]').first().click()
-                    cy.wait(1000)
-                })
-                describe('Timer value is changing', () => {
-                    it('Should have a dynamic value', () => {
-                        cy.get('[data-cy=timer-text]').should('not.have.value', '00:00:00')
-                    })
-                })
-                describe('User can proceed by using button', () => {
-                    it('Should redirect user to question page', () => {
-                        cy.get('[data-cy=start-button]').click()
-                        // UUID on question page are 111 characters length
-                        cy.url().should('have.length.above', 111)
-                    })
-                })
-            })
-        })
-    })
-})
+const section_route = {
+  method: "GET",
+  url: `${Cypress.env("SUPABASE_URL")}/rest/v1/sections`,
+  headers: {
+    apiKey: Cypress.env("SUPABASE_ANON_KEY"),
+    Range: "0",
+  },
+  auth: {
+    bearer: Cypress.env("SUPABASE_SERVICE_KEY"),
+  },
+  qs: {
+    select: "id,packages:package_id(id)",
+  },
+};
+
+describe("Section page", () => {
+  // For desktop view
+  context("720p resolution", () => {
+    beforeEach(() => {
+      /**
+       * Run these tests as if in a desktop browser,
+       * with a 720p monitor
+       */
+      cy.viewport(1280, 720);
+    });
+
+    describe("When user visited sections", () => {
+      before(() => {
+        cy.request(section_route).as("path");
+
+        cy.get("@path").then((response: any) => {
+          const path = response.body[0];
+          cy.log("section_id: ", path.id);
+
+          cy.visit(
+            `/${encodeURIComponent(path.packages.id)}/${encodeURIComponent(
+              path.id
+            )}`
+          );
+        });
+
+        cy.waitForReact();
+      });
+
+      it("Should have a running timer", () => {
+        cy.get("[data-cy=timer-text]").should("not.have.value", "00:00:00");
+      });
+
+      it("Should allow user proceed to question page", () => {
+        cy.get("[data-cy=start-button]").click();
+        // UUID URL on question page are 111 characters length
+        cy.url().should("have.length.above", 111);
+      });
+    });
+  });
+});
