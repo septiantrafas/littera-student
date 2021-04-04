@@ -75,8 +75,8 @@ const ExamQuestionPage = (props: IQuestionProps) => {
     const position = store.paths.findIndex(
       (arr) => arr.params.question.id === props.id
     );
-    const number = store.paths[position].params.question.number;
-    store.addToVisitedIndex(number);
+    const id = store.paths[position].params.question.id;
+    store.addToVisitedIndex(id);
   }, [store.paths, props.id]);
 
   return (
