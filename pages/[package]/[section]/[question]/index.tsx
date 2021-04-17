@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 import PageWithLayoutType from "@/types/pageWithLayout";
 import QuestionNavigator from "@/components/QuestionNavigator";
@@ -16,9 +16,21 @@ import {
 } from "@chakra-ui/react";
 import { observer } from "mobx-react";
 import { supabase } from "utils/initSupabase";
-import { GetServerSideProps } from "next";
+import { GetStaticPaths, GetStaticProps } from "next";
 import { useNavigationStore, useTimeStore } from "providers/RootStoreProvider";
 import { useRouter } from "next/router";
+
+type IStaticPath = {
+  id: string;
+  sections: {
+    id: string;
+    packages: { id: string };
+  };
+};
+
+type ISectionUrl = {
+  question: string;
+};
 
 type IQuestionsPath = {
   id: string;
@@ -193,7 +205,33 @@ const ExamQuestionPage = (props: IQuestionProps) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getStaticPaths: GetStaticPaths<ISectionUrl> = async () => {
+  const query = `
+  id,
+    sections:section_id (
+        id,
+        packages:package_id ( 
+          id 
+        ) 
+    )
+  `;
+
+  const res = await supabase.from<IStaticPath>("questions").select(query);
+  const paths = res.data.map((question) => ({
+    params: {
+      package: question.sections.packages.id.toString(),
+      section: question.sections.id,
+      question: question.id,
+    },
+  }));
+
+  return {
+    paths,
+    fallback: false,
+  };
+};
+
+export const getStaticProps: GetStaticProps = async (context) => {
   const query = `
   id,
   number,
