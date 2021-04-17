@@ -46,7 +46,7 @@ describe("Section page", () => {
         cy.get("[data-cy=timer-text]").should("not.have.value", "00:00:00");
       });
 
-      it.only("Should allow user proceed to question page", () => {
+      it("Should allow user proceed to question page", () => {
         cy.get("[data-cy=start-button]").click();
 
         // UUID URL on question page are 111 characters length

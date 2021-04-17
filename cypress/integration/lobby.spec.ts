@@ -24,7 +24,7 @@ describe("Lobby page", () => {
       cy.viewport(1280, 720);
     });
 
-    describe("When you visit lobby", () => {
+    describe.only("When you visit lobby", () => {
       before(() => {
         cy.request(lobby_route).as("path");
 
@@ -38,25 +38,31 @@ describe("Lobby page", () => {
         cy.waitForReact();
       });
 
-      it("Should visit lobby", () => {
-        // UUID URL on lobby page are 33 characters length
-        cy.url().should("include", "/lobby");
-      });
-
-      it("Should redirect user to next_path", () => {
-        cy.getReact("Lobby").getProps("paths").as("next_path");
+      it("Should be able to redirect user to next section", () => {
+        cy.getReact("Lobby").getProps().as("next_path");
 
         cy.get("@next_path").then((props: any) => {
-          cy.log("props: ", props);
+          cy.getReact("Lobby")
+            .getCurrentState()
+            .should("include", { isEligible: true });
 
-          cy.visit(
-            `/${encodeURIComponent(props.package.id)}/${encodeURIComponent(
-              props.id
-            )}`,
-            {
-              failOnStatusCode: true,
-            }
-          );
+          cy.getReact("Lobby")
+            .getCurrentState()
+            .should("include", { redirectPath: `/${props.paths.id}` });
+        });
+      });
+
+      it("Should be able to redirect user to verification page", () => {
+        cy.getReact("Lobby").getProps().as("next_path");
+
+        cy.get("@next_path").then((props: any) => {
+          cy.getReact("Lobby")
+            .getCurrentState()
+            .should("include", { isEligible: false });
+
+          cy.getReact("Lobby")
+            .getCurrentState()
+            .should("include", { redirectPath: "/verification" });
         });
       });
     });
