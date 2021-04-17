@@ -25,7 +25,7 @@ describe("Section page", () => {
     });
 
     describe("When user visited sections", () => {
-      before(() => {
+      beforeEach(() => {
         cy.request(section_route).as("path");
 
         cy.get("@path").then((response: any) => {
@@ -46,10 +46,20 @@ describe("Section page", () => {
         cy.get("[data-cy=timer-text]").should("not.have.value", "00:00:00");
       });
 
-      it("Should allow user proceed to question page", () => {
+      it.only("Should allow user proceed to question page", () => {
         cy.get("[data-cy=start-button]").click();
+
         // UUID URL on question page are 111 characters length
-        cy.url().should("have.length.above", 111);
+        cy.get("@path").then((response: any) => {
+          const path = response.body[0];
+
+          const package_id = path.packages.id;
+          const section_id = path.id;
+
+          cy.log("section_id: ", section_id);
+
+          cy.location("pathname").should("contain", `/${section_id}/`);
+        });
       });
     });
   });
