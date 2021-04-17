@@ -21,7 +21,6 @@ const dotenvPlugin = require("cypress-dotenv");
 module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
-  require("@swimlane/cy-mockapi").installPlugin(on, config);
   config = dotenvPlugin(config, {}, true);
   return config;
 };
