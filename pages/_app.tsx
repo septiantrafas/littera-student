@@ -3,9 +3,11 @@ import { CSSReset } from "@chakra-ui/react";
 import PageWithLayoutType from "@/types/pageWithLayout";
 import theme from "../theme";
 import { Chakra } from "../Chakra";
+import { CypressStoreProvider } from "providers/CypressStoreProvider";
 import { RootStoreProvider } from "../providers/RootStoreProvider";
 import { Auth } from "@supabase/ui";
 import { supabase } from "utils/initSupabase";
+
 import "styles/supabase.css";
 import "styles/globals.css";
 
@@ -32,16 +34,19 @@ class MyApp extends App<AppLayoutProps> {
       );
     } else {
       return (
-        <Chakra theme={theme} cookies={pageProps.cookies}>
-          <CSSReset />
-          <Auth.UserContextProvider supabaseClient={supabase}>
-            <RootStoreProvider hydrationData={pageProps.hydrationData}>
-              <Layout>
-                <Component {...pageProps} />
-              </Layout>
-            </RootStoreProvider>
-          </Auth.UserContextProvider>
-        </Chakra>
+        <>
+          <Chakra theme={theme} cookies={pageProps.cookies}>
+            <CSSReset />
+            <Auth.UserContextProvider supabaseClient={supabase}>
+              <RootStoreProvider hydrationData={pageProps.hydrationData}>
+                <CypressStoreProvider />
+                <Layout>
+                  <Component {...pageProps} />
+                </Layout>
+              </RootStoreProvider>
+            </Auth.UserContextProvider>
+          </Chakra>
+        </>
       );
     }
   }
