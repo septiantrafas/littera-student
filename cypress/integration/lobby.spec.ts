@@ -24,7 +24,7 @@ describe("Lobby page", () => {
       cy.viewport(1280, 720);
     });
 
-    describe.only("When you visit lobby", () => {
+    describe("Verified participant can join test", () => {
       before(() => {
         cy.request(lobby_route).as("path");
 
@@ -38,32 +38,51 @@ describe("Lobby page", () => {
         cy.waitForReact();
       });
 
-      it("Should be able to redirect user to next section", () => {
+      it("Should be an eligible participant", () => {
+        cy.getReact("Lobby")
+          .getCurrentState()
+          .should("include", { isEligible: true });
+      });
+
+      it("Should be wait for redirection", () => {
         cy.getReact("Lobby").getProps().as("next_path");
 
         cy.get("@next_path").then((props: any) => {
-          cy.getReact("Lobby")
-            .getCurrentState()
-            .should("include", { isEligible: true });
-
           cy.getReact("Lobby")
             .getCurrentState()
             .should("include", { redirectPath: `/${props.paths.id}` });
         });
       });
 
-      it("Should be able to redirect user to verification page", () => {
-        cy.getReact("Lobby").getProps().as("next_path");
+      it("Should be connected with users camera", () => {
+        // TODO: Search for camera requirement check on cypress docs
+      });
+    });
 
-        cy.get("@next_path").then((props: any) => {
-          cy.getReact("Lobby")
-            .getCurrentState()
-            .should("include", { isEligible: false });
+    describe("Unverified participant can't join test", () => {
+      before(() => {
+        cy.request(lobby_route).as("path");
 
-          cy.getReact("Lobby")
-            .getCurrentState()
-            .should("include", { redirectPath: "/verification" });
+        cy.get("@path").then((response: any) => {
+          const path = response.body[0];
+          cy.log("section_id: ", path.id);
+
+          cy.visit(`/${encodeURIComponent(path.packages.id)}/lobby`);
         });
+
+        cy.waitForReact();
+      });
+
+      it("Should not be an eligible participant", () => {
+        cy.getReact("Lobby")
+          .getCurrentState()
+          .should("include", { isEligible: false });
+      });
+
+      it("Should redirected to verification page", () => {
+        cy.getReact("Lobby")
+          .getCurrentState()
+          .should("include", { redirectPath: `/verification` });
       });
     });
   });
