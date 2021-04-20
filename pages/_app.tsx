@@ -21,34 +21,25 @@ class MyApp extends App<AppLayoutProps> {
     const { Component, pageProps } = this.props;
     const Layout = Component.layout || ((children) => <>{children}</>);
 
-    if (!Component.layout) {
-      return (
+    return (
+      <>
         <Chakra theme={theme} cookies={pageProps.cookies}>
           <CSSReset />
           <Auth.UserContextProvider supabaseClient={supabase}>
             <RootStoreProvider hydrationData={pageProps.hydrationData}>
-              <Component {...pageProps} />
-            </RootStoreProvider>
-          </Auth.UserContextProvider>
-        </Chakra>
-      );
-    } else {
-      return (
-        <>
-          <Chakra theme={theme} cookies={pageProps.cookies}>
-            <CSSReset />
-            <Auth.UserContextProvider supabaseClient={supabase}>
-              <RootStoreProvider hydrationData={pageProps.hydrationData}>
-                <CypressStoreProvider />
+              <CypressStoreProvider />
+              {!Component.layout ? (
+                <Component {...pageProps} />
+              ) : (
                 <Layout>
                   <Component {...pageProps} />
                 </Layout>
-              </RootStoreProvider>
-            </Auth.UserContextProvider>
-          </Chakra>
-        </>
-      );
-    }
+              )}
+            </RootStoreProvider>
+          </Auth.UserContextProvider>
+        </Chakra>
+      </>
+    );
   }
 }
 
