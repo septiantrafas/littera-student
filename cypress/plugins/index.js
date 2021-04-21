@@ -21,6 +21,17 @@ const dotenvPlugin = require("cypress-dotenv");
 module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
+  on("before:browser:launch", (browser = {}, launchOptions) => {
+    // args.push('--use-fake-device-for-media-stream')
+    if (browser.name === "chrome" || browser.name === "edge") {
+      launchOptions.args.push("--use-fake-ui-for-media-stream");
+      launchOptions.args.push("--use-fake-device-for-media-stream");
+    }
+
+    return launchOptions;
+  });
+
   config = dotenvPlugin(config, {}, true);
+
   return config;
 };
