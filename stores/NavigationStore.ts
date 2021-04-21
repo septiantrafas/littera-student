@@ -32,7 +32,7 @@ export type PathsHydration = {
 export class NavigationStore {
   root: RootStore;
   PATHS: Paths[];
-  VISITED_INDEX: number[] = [];
+  VISITED_INDEX: string[] = [];
   ANSWERED_INDEX: AnsweredIndex[] = [];
   NEXT_PATH: Paths;
   PREVIOUS_PATH: Paths;
@@ -72,11 +72,12 @@ export class NavigationStore {
     this.PREVIOUS_PATH = value;
   }
 
-  isVisited(index: number) {
+  isVisited(index: string) {
+    console.log(this.VISITED_INDEX.toString());
     return this.VISITED_INDEX.includes(index);
   }
 
-  addToVisitedIndex(index: number) {
+  addToVisitedIndex(index: string) {
     if (!this.isVisited(index)) {
       this.VISITED_INDEX.push(index);
     }

@@ -3,9 +3,11 @@ import { CSSReset } from "@chakra-ui/react";
 import PageWithLayoutType from "@/types/pageWithLayout";
 import theme from "../theme";
 import { Chakra } from "../Chakra";
+import { CypressStoreProvider } from "providers/CypressStoreProvider";
 import { RootStoreProvider } from "../providers/RootStoreProvider";
 import { Auth } from "@supabase/ui";
 import { supabase } from "utils/initSupabase";
+
 import "styles/supabase.css";
 import "styles/globals.css";
 
@@ -19,31 +21,25 @@ class MyApp extends App<AppLayoutProps> {
     const { Component, pageProps } = this.props;
     const Layout = Component.layout || ((children) => <>{children}</>);
 
-    if (!Component.layout) {
-      return (
+    return (
+      <>
         <Chakra theme={theme} cookies={pageProps.cookies}>
           <CSSReset />
           <Auth.UserContextProvider supabaseClient={supabase}>
             <RootStoreProvider hydrationData={pageProps.hydrationData}>
-              <Component {...pageProps} />
-            </RootStoreProvider>
-          </Auth.UserContextProvider>
-        </Chakra>
-      );
-    } else {
-      return (
-        <Chakra theme={theme} cookies={pageProps.cookies}>
-          <CSSReset />
-          <Auth.UserContextProvider supabaseClient={supabase}>
-            <RootStoreProvider hydrationData={pageProps.hydrationData}>
-              <Layout>
+              <CypressStoreProvider />
+              {!Component.layout ? (
                 <Component {...pageProps} />
-              </Layout>
+              ) : (
+                <Layout>
+                  <Component {...pageProps} />
+                </Layout>
+              )}
             </RootStoreProvider>
           </Auth.UserContextProvider>
         </Chakra>
-      );
-    }
+      </>
+    );
   }
 }
 

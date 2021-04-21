@@ -37,7 +37,7 @@ const Home: React.FC<IHomeProps> = ({ paths }) => {
         <Text fontSize="2xl" mt="2">
           Get started by signing up{" "}
           <NextLink href="/auth/signin">
-            <Link color="cyan.500">here</Link>
+            <Link color="cyan.500" data-cy="signin-link">here</Link>
           </NextLink>
         </Text>
 
@@ -55,7 +55,7 @@ const Home: React.FC<IHomeProps> = ({ paths }) => {
                 },
               }}
             >
-              <Link color="cyan.500">{path.package.id}</Link>
+              <Link color="cyan.500" data-cy="package-link">{path.package.id}</Link>
             </NextLink>
           </Box>
         ))}

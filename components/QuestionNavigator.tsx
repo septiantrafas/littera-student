@@ -158,7 +158,7 @@ const QuestionGrid = observer((props: QuestionGridProps) => {
     <Grid templateColumns="repeat(4, minmax(0, 1fr))" gap={2}>
       {store.paths.map((path) => {
         const number = path.params.question.number;
-        const isVisited = store.VISITED_INDEX.includes(number);
+        const isVisited = store.VISITED_INDEX.includes(path.params.question.id);
         const isActive = path.params.question.id === id;
         const isAnswered = store.isAnswered(path.params.question.id);
 
@@ -172,13 +172,37 @@ const QuestionGrid = observer((props: QuestionGridProps) => {
         };
 
         if (isActive) {
-          return <ActiveButton key={number} path={path} route={route} />;
+          return (
+            <ActiveButton
+              key={path.params.question.id}
+              path={path}
+              route={route}
+            />
+          );
         } else if (isVisited && !isAnswered) {
-          return <VisitedButton key={number} path={path} route={route} />;
+          return (
+            <VisitedButton
+              key={path.params.question.id}
+              path={path}
+              route={route}
+            />
+          );
         } else if (isVisited && isAnswered) {
-          return <AnsweredButton key={number} path={path} route={route} />;
+          return (
+            <AnsweredButton
+              key={path.params.question.id}
+              path={path}
+              route={route}
+            />
+          );
         } else {
-          return <UnvisitedButton key={number} path={path} route={route} />;
+          return (
+            <UnvisitedButton
+              key={path.params.question.id}
+              path={path}
+              route={route}
+            />
+          );
         }
       })}
     </Grid>

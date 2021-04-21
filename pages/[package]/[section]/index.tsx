@@ -10,6 +10,7 @@ import { Box, Button, Text } from "@chakra-ui/react";
 import { useNavigationStore, useTimeStore } from "providers/RootStoreProvider";
 import { supabase } from "utils/initSupabase";
 import timezone from "dayjs/plugin/timezone";
+import NextLink from "next/link";
 
 dayjs.extend(timezone);
 
@@ -95,21 +96,20 @@ const ExamCategoryPage = (props: ISectionProps) => {
           Contoh Soal
         </Text>
         <Text>{props.context}</Text>
-        <Button
-          mt="6"
-          onClick={() =>
-            router.push({
-              pathname: "/[package]/[section]/[question]",
-              query: {
-                package: navigation.next_path.params.package,
-                section: navigation.next_path.params.section,
-                question: navigation.next_path.params.question.id,
-              },
-            })
-          }
+        <NextLink
+          href={{
+            pathname: "/[package]/[section]/[question]",
+            query: {
+              package: navigation.next_path.params.package,
+              section: navigation.next_path.params.section,
+              question: navigation.next_path.params.question.id,
+            },
+          }}
         >
-          Start
-        </Button>
+          <Button data-cy="start-button" mt="6">
+            Start
+          </Button>
+        </NextLink>
       </Box>
     </>
   );
