@@ -18,8 +18,10 @@ import {
   VisuallyHidden,
 } from "@chakra-ui/react";
 import { LogoAlt } from "@/components/LogoAlt";
+import { useRouter } from "next/router";
 
 const Signin: React.FC = () => {
+  const router = useRouter();
   return (
     <Flex height="100vh" overflowY="hidden">
       <Box
@@ -29,13 +31,13 @@ const Signin: React.FC = () => {
       >
         <Box maxW={{ sm: "md" }} w={{ sm: "full" }} mx="auto">
           <Box px={{ base: "4" }}>
-            <NextLink href="/">
-              <LogoAlt
-                h="10"
-                iconColor={mode("gray.900", "gray.200")}
-                cursor="pointer"
-              />
-            </NextLink>
+            <LogoAlt
+              h="10"
+              onClick={() => router.push("/")}
+              iconColor={mode("gray.900", "gray.200")}
+              cursor="pointer"
+            />
+
             <Heading mt="4" textAlign="left" size="xl" fontWeight="extrabold">
               Sign in to your account
             </Heading>
