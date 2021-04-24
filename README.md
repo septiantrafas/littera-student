@@ -1,4 +1,4 @@
-Littera is an online assessment platform by FESA. We aim to provide multiple use cases for online assessment.
+Littera is an online assessment platform, we aim to provide multiple use cases for FESA.
 
 ## Getting Started
 
@@ -19,6 +19,7 @@ To learn more about Littera Student App, take a look at the following resources:
 - [Supabase Documentation](https://supabase.io/docs/guides/platform) - Introduction on Supabase services.
 - [Zoom WebSDK Documentation](https://marketplace.zoom.us/docs/sdk/native-sdks/web) - learn about Zoom Web integration.
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Cypress Documentation](https://docs.cypress.io/) - learn more about Cypress E2E testing
 
 ## Deployment
 

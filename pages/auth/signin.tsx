@@ -9,17 +9,21 @@ import NextLink from "next/link";
 import {
   Box,
   Button,
+  Divider,
   Flex,
   Heading,
   Img,
   SimpleGrid,
+  Stack,
   Text,
   useColorModeValue as mode,
   VisuallyHidden,
 } from "@chakra-ui/react";
 import { LogoAlt } from "@/components/LogoAlt";
+import { useRouter } from "next/router";
 
 const Signin: React.FC = () => {
+  const router = useRouter();
   return (
     <Flex height="100vh" overflowY="hidden">
       <Box
@@ -29,14 +33,20 @@ const Signin: React.FC = () => {
       >
         <Box maxW={{ sm: "md" }} w={{ sm: "full" }} mx="auto">
           <Box px={{ base: "4" }}>
-            <NextLink href="/">
-              <LogoAlt
-                h="10"
-                iconColor={mode("gray.900", "gray.200")}
-                cursor="pointer"
-              />
-            </NextLink>
-            <Heading mt="4" textAlign="left" size="xl" fontWeight="extrabold">
+            <LogoAlt
+              h="10"
+              onClick={() => router.push("/")}
+              iconColor={mode("gray.900", "gray.200")}
+              cursor="pointer"
+            />
+
+            <Heading
+              mt="6"
+              textAlign="left"
+              size="xl"
+              fontWeight="extrabold"
+              lineHeight="1"
+            >
               Sign in to your account
             </Heading>
             <Text mt="4" align="left" maxW="md" fontWeight="medium">
@@ -54,14 +64,16 @@ const Signin: React.FC = () => {
             </Text>
           </Box>
         </Box>
-        <Box maxW={{ sm: "md" }} mt="8" w={{ sm: "full" }} mx="auto">
-          <Box py="8" px={{ base: "4" }} rounded={{ sm: "lg" }}>
-            <Auth
-              supabaseClient={supabase}
-              view="sign_in"
-              socialLayout="horizontal"
-              socialButtonSize="xlarge"
-            />
+        <Stack mt="8" direction="row" alignItems="center">
+          <Divider mr="2" />
+          <Text mr="2" fontSize="sm" fontWeight="semibold" color="gray.300">
+            OR
+          </Text>
+          <Divider />
+        </Stack>
+        <Box maxW={{ sm: "md" }} w={{ sm: "full" }} mx="auto">
+          <Box px={{ base: "4" }}>
+            <Auth supabaseClient={supabase} view="magic_link" />
           </Box>
         </Box>
       </Box>
