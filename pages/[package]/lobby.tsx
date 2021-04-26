@@ -66,6 +66,32 @@ const Lobby: React.FC<ILobbyProps> = ({ paths }) => {
   useEffect(() => {
     if (isDevelopment) {
       setTimeout(() => {
+        setStatus("Checking your internet speed...");
+        setProgress(20);
+      }, 5000);
+
+      setTimeout(() => {
+        setStatus("Checking your hardware...");
+        setProgress(40);
+      }, 10000);
+
+      setTimeout(() => {
+        setStatus("Verifying your identity...");
+        setProgress(60);
+      }, 15000);
+
+      setTimeout(() => {
+        setStatus("Preparing test environment...");
+        // TODO: Set browser to full-screen
+        setProgress(80);
+      }, 20000);
+
+      setTimeout(() => {
+        setStatus("Waiting for test to start");
+        setProgress(100);
+      }, 25000);
+
+      setTimeout(() => {
         router.push({
           pathname: "/[package]/[section]",
           query: {
