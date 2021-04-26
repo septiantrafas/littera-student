@@ -1,14 +1,13 @@
-import Head from "next/head";
-// import Image from "next/image";
-
 import React, { useEffect, useState } from "react";
 import PageWithLayoutType from "@/types/pageWithLayout";
+import { useRouter } from "next/router";
 
 import Default from "@/layouts/default";
 import {
   Avatar,
   AvatarBadge,
   Box,
+  Button,
   chakra,
   Flex,
   Link,
@@ -16,9 +15,15 @@ import {
   Text,
   useColorModeValue as mode,
 } from "@chakra-ui/react";
-import { HiOutlineVideoCamera, HiOutlineMicrophone } from "react-icons/hi";
+import {
+  HiOutlineVideoCamera,
+  HiOutlineMicrophone,
+  HiArrowRight,
+} from "react-icons/hi";
 
 const Permission: React.FC = () => {
+  const router = useRouter();
+
   const [isMediaPermissionGranted, setMediaPermission] = useState(false);
 
   useEffect(() => {
@@ -134,6 +139,17 @@ const Permission: React.FC = () => {
             Pertimbangan mengenai hak dan privasi pengguna dapat anda lihat
             kembali <Link fontWeight="semibold">disini</Link>
           </Text>
+          <Button
+            mt="8"
+            colorScheme="blue"
+            rightIcon={<HiArrowRight />}
+            isDisabled={!isMediaPermissionGranted}
+            onClick={() => {
+              router.push("/");
+            }}
+          >
+            Lanjut
+          </Button>
         </Box>
       </Box>
     </>
