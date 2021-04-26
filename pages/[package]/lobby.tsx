@@ -1,14 +1,15 @@
 import Head from "next/head";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import PageWithLayoutType from "@/types/pageWithLayout";
 
 import Default from "@/layouts/default";
 import { Box, Flex, Progress, Spinner, Text } from "@chakra-ui/react";
 import { HiOutlineExclamation } from "react-icons/hi";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
 import { supabase } from "utils/initSupabase";
 import { useRouter } from "next/router";
+import { UrlObject } from "url";
 
 type ILobbyProps = {
   paths: {
@@ -17,23 +18,63 @@ type ILobbyProps = {
   };
 };
 
+type ILobbyStaticPaths = {
+  id: string;
+  packages: { id: string };
+};
+
+type LobbyState = {
+  isEligible: boolean;
+  redirectPath: string | UrlObject;
+};
+
 const Lobby: React.FC<ILobbyProps> = ({ paths }) => {
   const router = useRouter();
+  const isDevelopment = process.env.NEXT_PUBLIC_ENVIRONMENT === "development";
+
+  const [{ isEligible, redirectPath }, setState] = useState<LobbyState>({
+    isEligible: false,
+    redirectPath: "/verification",
+  });
+
+  const [progress, setProgress] = useState(10);
+  const [status, setStatus] = useState("Establishing connection...");
 
   useEffect(() => {
-    console.log(paths);
-    setTimeout(() => {
-      router.push({
-        pathname: "/[package]/[section]",
-        query: {
-          package: paths.package.id,
-          section: paths.id,
-        },
+    if (isEligible) {
+      setState((prevState) => {
+        return {
+          ...prevState,
+          redirectPath: {
+            pathname: "/[package]/[section]",
+            query: {
+              package: paths.package.id,
+              section: paths.id,
+            },
+          },
+        };
       });
-    }, 5000);
-    // return () => {
-    //   cleanup
-    // }
+    }
+  }, [isEligible]);
+
+  // useEffect(() => {
+  //   if (isStarted) {
+  //     router.push(redirectPath)
+  //   }
+  // }, [isStarted])
+
+  useEffect(() => {
+    if (isDevelopment) {
+      setTimeout(() => {
+        router.push({
+          pathname: "/[package]/[section]",
+          query: {
+            package: paths.package.id,
+            section: paths.id,
+          },
+        });
+      }, 35000);
+    }
   }, []);
 
   return (
@@ -57,14 +98,14 @@ const Lobby: React.FC<ILobbyProps> = ({ paths }) => {
             indicates your level of ability.
           </Text>
           <Box mt="20">
-            <Text fontSize="xl">Verifying your identity..</Text>
+            <Text fontSize="xl">{status}</Text>
             <Progress
               w="80%"
               mt="5"
               colorScheme="twitter"
               mx="auto"
               hasStripe
-              value={20}
+              value={progress}
               isAnimated
             />
           </Box>
@@ -74,7 +115,28 @@ const Lobby: React.FC<ILobbyProps> = ({ paths }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getStaticPaths: GetStaticPaths = async () => {
+  const query = `
+    id,
+    packages:package_id ( id ) 
+  )
+  `;
+
+  const res = await supabase.from<ILobbyStaticPaths>("sections").select(query);
+  const paths = res.data.map((section) => ({
+    params: {
+      package: section.packages.id,
+      section: "lobby",
+    },
+  }));
+
+  return {
+    paths,
+    fallback: false,
+  };
+};
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
   const query = `
   id,
   package:package_id (id)
@@ -83,7 +145,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const res = await supabase
     .from<any>("sections")
     .select(query)
-    .match({ package_id: context.params.package.toString() })
+    .match({ package_id: params.package.toString() })
     .order("number", { ascending: true })
     .limit(1);
 
