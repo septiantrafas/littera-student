@@ -17,7 +17,6 @@ import {
   Stack,
   Text,
   useColorModeValue as mode,
-  VisuallyHidden,
 } from "@chakra-ui/react";
 import { LogoAlt } from "@/components/LogoAlt";
 import { useRouter } from "next/router";
@@ -95,5 +94,14 @@ const Signin: React.FC = () => {
 };
 
 (Signin as PageWithLayoutType).layout = Authenticated;
+
+export const getStaticProps = async () => {
+  return {
+    redirect: {
+      destination: "/",
+      permanent: false,
+    },
+  };
+};
 
 export default Signin;

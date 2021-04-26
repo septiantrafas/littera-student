@@ -1,5 +1,5 @@
 import Head from "next/head";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import NextLink from "next/link";
 import PageWithLayoutType from "@/types/pageWithLayout";
 import Default from "@/layouts/default";
@@ -13,6 +13,8 @@ import {
   Button,
   Skeleton,
   Img,
+  Input,
+  useToast,
 } from "@chakra-ui/react";
 import { GetServerSideProps, GetStaticProps } from "next";
 import { supabase } from "utils/initSupabase";
@@ -27,6 +29,7 @@ import {
 } from "react-icons/hi";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
+import { stat } from "fs/promises";
 
 type PackageRouteResponse = {
   id: string;
@@ -55,12 +58,49 @@ const fetcher = (url, token) =>
 
 const Home: React.FC<IHomeProps> = ({ paths }) => {
   const router = useRouter();
+  const toast = useToast();
   const { user, session } = Auth.useUser();
+
+  const [email, setEmail] = useState("");
+  const [isLoading, setLoading] = useState(false);
 
   const { data, error } = useSWR(
     session ? ["/api/getUser", session.access_token] : null,
     fetcher
   );
+
+  const handleMagicLink = async (email) => {
+    try {
+      const { user, session, error } = await supabase.auth.signIn({
+        email: email,
+      });
+
+      if (error) {
+        toast({
+          title: error.name,
+          status: "error",
+          description: error.message,
+          position: "top-right",
+          duration: 5000,
+          isClosable: true,
+        });
+
+        setLoading(false);
+      } else if (!user) {
+        toast({
+          title: "Success",
+          status: "success",
+          position: "top-right",
+          description: "Email konfirmasi terkirim",
+          isClosable: true,
+        });
+
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log("error:", error);
+    }
+  };
 
   if (!user) {
     return (
@@ -80,21 +120,36 @@ const Home: React.FC<IHomeProps> = ({ paths }) => {
               <chakra.a color="gray.800">Korporasi</chakra.a>
             </Text>
 
-            <Button
-              mt="10"
-              maxW="25%"
-              boxShadow="lg"
-              bg="gray.800"
-              color="white"
-              _hover={{
-                bg: "gray.700",
-                color: "white",
-              }}
-              rightIcon={<HiArrowRight />}
-              onClick={() => router.push("/auth/signin")}
-            >
-              Ikuti asesmen
-            </Button>
+            <Flex mt="8">
+              <Input
+                maxW="40%"
+                mr="3"
+                placeholder="Email"
+                borderRadius="lg"
+                shadow="base"
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Button
+                maxW="25%"
+                boxShadow="lg"
+                bg="gray.800"
+                color="white"
+                _hover={{
+                  bg: "gray.700",
+                  color: "white",
+                }}
+                rightIcon={<HiArrowRight />}
+                isLoading={isLoading}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setLoading(true);
+                  handleMagicLink(email);
+                }}
+                // onClick={() => router.push("/auth/signin")}
+              >
+                Ikuti asesmen
+              </Button>
+            </Flex>
           </Flex>
         </Flex>
       </>
