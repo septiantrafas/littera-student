@@ -45,10 +45,6 @@ type PackageRouteResponse = {
   };
 };
 
-type IHomeProps = {
-  paths: PackageRouteResponse[];
-};
-
 const fetcher = (url, token) =>
   fetch(url, {
     method: "GET",
@@ -56,13 +52,14 @@ const fetcher = (url, token) =>
     credentials: "same-origin",
   }).then((res) => res.json());
 
-const Home: React.FC<IHomeProps> = ({ paths }) => {
+const Home: React.FC = () => {
   const router = useRouter();
   const toast = useToast();
   const { user, session } = Auth.useUser();
 
   const [email, setEmail] = useState("");
   const [isLoading, setLoading] = useState(false);
+  const [schedules, setSchedules] = useState([]);
 
   const { data, error } = useSWR(
     session ? ["/api/getUser", session.access_token] : null,
@@ -101,6 +98,29 @@ const Home: React.FC<IHomeProps> = ({ paths }) => {
       console.log("error:", error);
     }
   };
+
+  useEffect(() => {
+    const handleAsync = async () => {
+      if (user) {
+        const query = `
+        id,
+        schedule:schedules_id (
+          name,
+          exam_date,
+          url,
+          package_id
+        )
+        `;
+        const res = await supabase
+          .from<any>("participants")
+          .select(query)
+          .match({ profiles_id: user.id });
+
+        setSchedules(res.data);
+      }
+    };
+    handleAsync();
+  }, [user, schedules]);
 
   if (!user) {
     return (
@@ -145,7 +165,6 @@ const Home: React.FC<IHomeProps> = ({ paths }) => {
                   setLoading(true);
                   handleMagicLink(email);
                 }}
-                // onClick={() => router.push("/auth/signin")}
               >
                 Ikuti asesmen
               </Button>
@@ -180,53 +199,42 @@ const Home: React.FC<IHomeProps> = ({ paths }) => {
             </Skeleton>
           </Box>
 
-          {paths.map((path) => (
-            <Box
-              key={path.package.id}
-              borderWidth="1px"
-              borderColor="gray.200"
-              borderRadius="lg"
-              shadow="md"
-              bg="white"
-              p="6"
-            >
-              <Heading fontSize="2xl">{path.package.name}</Heading>
-              <Text color="gray.400">By {path.package.organization.name}</Text>
-              <Text color="gray.400">
-                Dimulai pada{" "}
-                {dayjs(path.start_time).format("DD MMM YYYY - HH:mm")}
-              </Text>
-              <Flex alignItems="center">
-                <HiHome />
-                <Text ml="2">{path.package.organization.address}</Text>
-              </Flex>
-              <Flex alignItems="center">
-                <HiPhone />
-                <Text ml="2">{path.package.organization.phone}</Text>
-              </Flex>
-              <Flex w="full" justifyContent="flex-end">
-                <NextLink
-                  href={{
-                    pathname: "/[package]/[section]",
-                    query: {
-                      package: path.package.id,
-                      section: path.id,
-                    },
-                  }}
-                  passHref
-                >
-                  <Button
-                    mt="4"
-                    size="sm"
-                    rightIcon={<HiArrowRight />}
-                    colorScheme="blue"
+          {!!schedules.length ? (
+            <Text>No Invite</Text>
+          ) : (
+            schedules.map(({ schedule }) => (
+              <Box
+                key={schedule.id}
+                borderWidth="1px"
+                borderColor="gray.200"
+                borderRadius="lg"
+                shadow="base"
+                bg="white"
+                p="6"
+              >
+                <Heading fontSize="2xl">{schedule.name}</Heading>
+                <Text color="gray.400">
+                  Dimulai pada{" "}
+                  {dayjs(schedule.exam_date).format("DD MMM YYYY - HH:mm")}
+                </Text>
+                <Flex mt="4">
+                  <NextLink
+                    href={`/${encodeURIComponent(schedule.package_id)}/lobby`}
+                    passHref
                   >
-                    Ikuti Asesmen
-                  </Button>
-                </NextLink>
-              </Flex>
-            </Box>
-          ))}
+                    <Button
+                      mt="4"
+                      size="sm"
+                      rightIcon={<HiArrowRight />}
+                      colorScheme="blue"
+                    >
+                      Ikuti Asesmen
+                    </Button>
+                  </NextLink>
+                </Flex>
+              </Box>
+            ))
+          )}
           <Flex direction="column" mt="4">
             <Button
               variant="link"
@@ -240,36 +248,6 @@ const Home: React.FC<IHomeProps> = ({ paths }) => {
       </Flex>
     </div>
   );
-};
-
-export const getStaticProps: GetStaticProps = async () => {
-  const query = `
-  id,
-  start_time,
-  package:package_id (
-    id,
-    name,
-    organization:organization_id (
-      name,
-      address,
-      phone
-    )
-  )
-  `;
-
-  const res = await supabase
-    .from<any>("sections")
-    .select(query)
-    .order("number", { ascending: true })
-    .limit(1);
-
-  const data = res.data;
-  // Pass data to the page via props
-  return {
-    props: {
-      paths: data,
-    },
-  };
 };
 
 (Home as PageWithLayoutType).layout = Default;
