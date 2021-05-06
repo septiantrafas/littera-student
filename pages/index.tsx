@@ -199,8 +199,12 @@ const Home: React.FC = () => {
             </Skeleton>
           </Box>
 
-          {!!schedules.length ? (
-            <Text>No Invite</Text>
+          {!schedules?.length ? (
+            <Box py="20" px="4" bg="gray.100" borderRadius="lg">
+              <Text color="gray.400" textAlign="center">
+                No Invite
+              </Text>
+            </Box>
           ) : (
             schedules.map(({ schedule }) => (
               <Box
@@ -237,8 +241,10 @@ const Home: React.FC = () => {
           )}
           <Flex direction="column" mt="4">
             <Button
-              variant="link"
               size="sm"
+              variant="ghost"
+              colorScheme="red"
+              rightIcon={<HiLogout />}
               onClick={() => supabase.auth.signOut()}
             >
               Keluar
