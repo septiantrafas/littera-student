@@ -142,23 +142,9 @@ const Lobby: React.FC<ILobbyProps> = ({ paths }) => {
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const query = `
-    id,
-    packages:package_id ( id ) 
-  )
-  `;
-
-  const res = await supabase.from<ILobbyStaticPaths>("sections").select(query);
-  const paths = res.data.map((section) => ({
-    params: {
-      package: section.packages.id,
-      section: "lobby",
-    },
-  }));
-
   return {
-    paths,
-    fallback: false,
+    paths: [],
+    fallback: true,
   };
 };
 
@@ -181,6 +167,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     props: {
       paths: data,
     },
+    revalidate: 3600,
   };
 };
 

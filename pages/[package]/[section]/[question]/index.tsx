@@ -20,18 +20,6 @@ import { GetStaticPaths, GetStaticProps } from "next";
 import { useNavigationStore, useTimeStore } from "providers/RootStoreProvider";
 import { useRouter } from "next/router";
 
-type IStaticPath = {
-  id: string;
-  sections: {
-    id: string;
-    packages: { id: string };
-  };
-};
-
-type ISectionUrl = {
-  question: string;
-};
-
 type IQuestionsPath = {
   id: string;
   number: number;
@@ -52,10 +40,6 @@ type IQuestionsResponse = {
   options: string[];
   created_at: string;
   updated_at: string;
-};
-
-type IQuestionsUrl = {
-  question: string;
 };
 
 type IQuestionProps = {
@@ -205,29 +189,10 @@ const ExamQuestionPage = (props: IQuestionProps) => {
   );
 };
 
-export const getStaticPaths: GetStaticPaths<ISectionUrl> = async () => {
-  const query = `
-  id,
-    sections:section_id (
-        id,
-        packages:package_id ( 
-          id 
-        ) 
-    )
-  `;
-
-  const res = await supabase.from<IStaticPath>("questions").select(query);
-  const paths = res.data.map((question) => ({
-    params: {
-      package: question.sections.packages.id.toString(),
-      section: question.sections.id,
-      question: question.id,
-    },
-  }));
-
+export const getStaticPaths: GetStaticPaths = async () => {
   return {
-    paths,
-    fallback: false,
+    paths: [],
+    fallback: true,
   };
 };
 
@@ -293,6 +258,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
       question: data.question,
       options: data.options,
     },
+    revalidate: 3600,
   };
 };
 

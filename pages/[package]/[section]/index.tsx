@@ -14,22 +14,6 @@ import NextLink from "next/link";
 
 dayjs.extend(timezone);
 
-type IStaticPath = {
-  id: string;
-  packages: { id: string };
-};
-
-type ISectionsPath = {
-  id: string;
-  sections: {
-    id: string;
-    number: number;
-    packages: {
-      id: string;
-    };
-  };
-};
-
 type ISectionResponse = {
   id: string;
   number: number;
@@ -41,10 +25,6 @@ type ISectionResponse = {
     start_time: string;
     end_time: string;
   };
-};
-
-type ISectionUrl = {
-  section: string;
 };
 
 type ISectionProps = {
@@ -115,24 +95,10 @@ const ExamCategoryPage = (props: ISectionProps) => {
   );
 };
 
-export const getStaticPaths: GetStaticPaths<ISectionUrl> = async () => {
-  const query = `
-    id,
-    packages:package_id ( id ) 
-  )
-  `;
-
-  const res = await supabase.from<IStaticPath>("sections").select(query);
-  const paths = res.data.map((section) => ({
-    params: {
-      package: section.packages.id,
-      section: section.id,
-    },
-  }));
-
+export const getStaticPaths: GetStaticPaths = async () => {
   return {
-    paths,
-    fallback: false,
+    paths: [],
+    fallback: true,
   };
 };
 
@@ -218,6 +184,7 @@ export const getStaticProps = async ({
       start_time: sections.start_time,
       end_time: sections.end_time,
     },
+    revalidate: 3600,
   };
 };
 
