@@ -116,7 +116,9 @@ const Home: React.FC = () => {
           .select(query)
           .match({ profiles_id: user.id });
 
-        setSchedules(res.data);
+        if (res.data.length) {
+          setSchedules(res.data);
+        }
       }
     };
     handleAsync();
@@ -199,7 +201,7 @@ const Home: React.FC = () => {
             </Skeleton>
           </Box>
 
-          {!schedules && (
+          {!schedules.length && (
             <Box py="20" px="4" bg="gray.100" borderRadius="lg">
               <Text color="gray.400" textAlign="center">
                 No Invite
