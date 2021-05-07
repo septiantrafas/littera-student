@@ -104,7 +104,7 @@ const Home: React.FC = () => {
       if (user) {
         const query = `
         id,
-        schedule:schedules_id (
+        schedule:schedule_id (
           name,
           exam_date,
           url,
@@ -120,7 +120,7 @@ const Home: React.FC = () => {
       }
     };
     handleAsync();
-  }, [user, schedules]);
+  }, [user]);
 
   if (!user) {
     return (
@@ -199,16 +199,17 @@ const Home: React.FC = () => {
             </Skeleton>
           </Box>
 
-          {!schedules?.length ? (
+          {!schedules && (
             <Box py="20" px="4" bg="gray.100" borderRadius="lg">
               <Text color="gray.400" textAlign="center">
                 No Invite
               </Text>
             </Box>
-          ) : (
+          )}
+          {schedules &&
             schedules.map(({ schedule }) => (
               <Box
-                key={schedule.id}
+                key={schedule.name}
                 borderWidth="1px"
                 borderColor="gray.200"
                 borderRadius="lg"
@@ -237,8 +238,7 @@ const Home: React.FC = () => {
                   </NextLink>
                 </Flex>
               </Box>
-            ))
-          )}
+            ))}
           <Flex direction="column" mt="4">
             <Button
               size="sm"
