@@ -76,26 +76,17 @@ export const TimeKeeper = observer(() => {
 
   return (
     <>
-      <Flex
-        borderRightRadius="full"
-        borderLeftRadius="full"
-        borderWidth="1px"
-        alignItems="center"
-        borderColor={mode("gray.200", "gray.600")}
-        color="gray.400"
-        px="4"
-        py="2"
-      >
-        <HiOutlineClock size="1.25em" />
+      <Flex alignItems="center" color="gray.400" px="4" py="2">
         <Text
           id="time"
           fontSize="sm"
-          ml="2"
+          mr="2"
           color={mode("gray.400", "gray.400")}
           data-cy="timer-text"
         >
           00:00:00
         </Text>
+        <HiOutlineClock size="1em" />
       </Flex>
     </>
   );
