@@ -13,12 +13,20 @@ import {
   Text,
   Flex,
   Divider,
+  Button,
 } from "@chakra-ui/react";
 import { observer } from "mobx-react";
 import { supabase } from "utils/initSupabase";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { useNavigationStore, useTimeStore } from "providers/RootStoreProvider";
 import { useRouter } from "next/router";
+import NextLink from "next/link";
+import {
+  HiArrowRight,
+  HiArrowLeft,
+  HiChevronLeft,
+  HiChevronRight,
+} from "react-icons/hi";
 
 type IQuestionsPath = {
   id: string;
@@ -36,6 +44,7 @@ type IQuestionsResponse = {
   id: string;
   section_id: string;
   number: number;
+  text?: string;
   question: string;
   options: string[];
   created_at: string;
@@ -46,6 +55,7 @@ type IQuestionProps = {
   id: string;
   section_id: string;
   number: number;
+  text?: string;
   question: string;
   options: string[];
 };
@@ -76,18 +86,19 @@ const ExamQuestionPage = (props: IQuestionProps) => {
   }, [store.paths, props.id]);
 
   return (
-    <Flex height="95vh" justifyContent="center">
-      <Box
-        position="relative"
-        w="100%"
-        px="10"
-        py="12"
-        overflow="scroll"
-        bg={mode("white", "trueGray.800")}
-      >
+    <Flex height="95vh" bg={mode("white", "trueGray.800")}>
+      <QuestionNavigator id={props.id} />
+      <Box w="50%" px="10" py="12" overflow="scroll">
+        <Text>
+          {!props.text && `${props.number}. ${props.question}`}
+          {props.text}
+        </Text>
+      </Box>
+      <Box w="50%" px="10" py="12" justifyContent="space-between">
         <Box maxW={{ xl: "2xl", "2xl": "3xl" }} mx="auto">
-          <Text fontSize="xl" fontWeight="semibold">
-            {props.number}. {props.question}
+          <Text fontWeight="semibold">
+            {props.text && `${props.number}. ${props.question}`}
+            {!props.text && ``}
           </Text>
           <RadioGroup
             onChange={(value: number) =>
@@ -97,10 +108,10 @@ const ExamQuestionPage = (props: IQuestionProps) => {
               })
             }
             value={store.getSelectedOption(props.id)}
-            mt="10"
+            mt="6"
           >
-            <Stack direction="column" spacing="5">
-              {props.options.map((item, index) => {
+            <Stack direction="column" spacing="3">
+              {props.options?.map((item, index) => {
                 const number = index + 1;
                 const isItemSelected =
                   store.getSelectedOption(props.id) === number;
@@ -111,7 +122,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                     d="flex"
                     cursor="pointer"
                     borderWidth="1px"
-                    borderRadius="xl"
+                    borderRadius="lg"
                     bg={
                       isItemSelected
                         ? mode("blue.50", "gray.800")
@@ -143,7 +154,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                     }}
                   >
                     <Text
-                      fontSize="5xl"
+                      fontSize="3xl"
                       fontWeight="bold"
                       textColor={
                         isItemSelected
@@ -157,9 +168,10 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                       {String.fromCharCode("a".charCodeAt(0) + index)}
                     </Text>
                     <Radio
-                      my="10"
+                      my="4"
                       value={number}
                       cursor="pointer"
+                      size="md"
                       onClick={() =>
                         store.setAnsweredIndex({
                           question_id: props.id,
@@ -176,14 +188,57 @@ const ExamQuestionPage = (props: IQuestionProps) => {
             </Stack>
           </RadioGroup>
         </Box>
-      </Box>
-      <Divider orientation="vertical" />
-      <Box
-        w={{ xl: "30%", "2xl": "25%" }}
-        bg={mode("gray.50", "trueGray.900")}
-        justifyContent="space-between"
-      >
-        <QuestionNavigator id={props.id} />
+        <Flex mt="4" w="full" alignItems="flex-end">
+          <Flex w="full" alignItems="center" justifyContent="space-between">
+            <NextLink
+              href={
+                store.previous_path
+                  ? {
+                      pathname: "/[package]/[section]/[question]",
+                      query: {
+                        package: store.previous_path.params.package,
+                        section: store.previous_path.params.section,
+                        question: store.previous_path.params.question.id,
+                      },
+                    }
+                  : ""
+              }
+            >
+              <Button
+                variant="ghost"
+                textColor="gray.600"
+                leftIcon={<HiChevronLeft />}
+                isDisabled={!store.previous_path}
+              >
+                Back
+              </Button>
+            </NextLink>
+
+            <NextLink
+              href={
+                store.next_path
+                  ? {
+                      pathname: "/[package]/[section]/[question]",
+                      query: {
+                        package: store.next_path.params.package,
+                        section: store.next_path.params.section,
+                        question: store.next_path.params.question.id,
+                      },
+                    }
+                  : ""
+              }
+            >
+              <Button
+                variant="ghost"
+                textColor="gray.600"
+                rightIcon={<HiChevronRight />}
+                isDisabled={!store.next_path}
+              >
+                Next
+              </Button>
+            </NextLink>
+          </Flex>
+        </Flex>
       </Box>
     </Flex>
   );
@@ -248,6 +303,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
       previous_path,
     },
   };
+  console.log(hydrationData);
   // Pass data to the page via props
   return {
     props: {
@@ -255,6 +311,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
       id: data.id,
       section_id: data.section_id,
       number: data.number,
+      text: data.text,
       question: data.question,
       options: data.options,
     },
