@@ -3,6 +3,7 @@ import { observer } from "mobx-react-lite";
 import { useTimeStore } from "providers/RootStoreProvider";
 
 import { Flex, Text, useColorModeValue as mode } from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/toast";
 import { HiOutlineClock } from "react-icons/hi";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -11,8 +12,11 @@ import { useRouter } from "next/router";
 dayjs.extend(utc);
 
 export const TimeKeeper = observer(() => {
+  const [isReminded, setIsReminded] = useState(false);
   const store = useTimeStore();
   const router = useRouter();
+  const toast = useToast();
+  const toast_id = "time-reminder";
 
   useEffect(() => {
     setTimeout(() => {
@@ -22,8 +26,23 @@ export const TimeKeeper = observer(() => {
       if (timeLeft.unix() > 0) {
         store.updateTime(dayjs(store.TIME).add(1, "seconds").toISOString());
         document.getElementById("time").innerHTML = timeLeft.format("HH:mm:ss");
+
+        if (timeLeft.unix() < 60 && !isReminded && !toast.isActive(toast_id)) {
+          setIsReminded(true);
+
+          toast({
+            id: toast_id,
+            title: "Peringatan",
+            description: "Waktu tersisa satu menit lagi",
+            status: "info",
+            duration: 2000,
+            isClosable: true,
+            position: "top",
+          });
+        }
       } else {
         document.getElementById("time").innerHTML = "00:00:00";
+        setIsReminded(false);
         router.push({
           pathname: "/[package]/[section]",
           query: {
@@ -55,11 +74,9 @@ export const TimeKeeper = observer(() => {
     }
   }, []);
 
-  // render data
   return (
     <>
       <Flex
-        // hidden={!store.endTime}
         borderRightRadius="full"
         borderLeftRadius="full"
         borderWidth="1px"
