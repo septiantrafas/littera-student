@@ -26,8 +26,9 @@ function QuestionNavigator(props: { id: string }) {
         h="full"
         borderRight="1px"
         borderColor="gray.200"
+        overflow="scroll"
       >
-        <Box height={{ xl: "65%", "2xl": "40%" }} px="3" py="4">
+        <Box px="3" py="4">
           <QuestionGrid store={store} id={props.id} />
         </Box>
       </Box>
