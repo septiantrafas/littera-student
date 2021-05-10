@@ -12,7 +12,6 @@ import {
   Stack,
   Text,
   Flex,
-  Divider,
   Button,
 } from "@chakra-ui/react";
 import { observer } from "mobx-react";
@@ -21,12 +20,7 @@ import { GetStaticPaths, GetStaticProps } from "next";
 import { useNavigationStore, useTimeStore } from "providers/RootStoreProvider";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
-import {
-  HiArrowRight,
-  HiArrowLeft,
-  HiChevronLeft,
-  HiChevronRight,
-} from "react-icons/hi";
+import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 
 type IQuestionsPath = {
   id: string;
@@ -285,8 +279,9 @@ export const getStaticProps: GetStaticProps = async (context) => {
     (arr) => arr.params.question.id === context.params.question.toString()
   );
 
-  const next_path = paths[position + 1] ? paths[position + 1] : null;
   const previous_path = paths[position - 1] ? paths[position - 1] : null;
+  const current_path = paths[position];
+  const next_path = paths[position + 1] ? paths[position + 1] : null;
 
   const res = await supabase
     .from<IQuestionsResponse>("questions")
@@ -299,8 +294,9 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const hydrationData = {
     navigationStore: {
       paths,
-      next_path,
       previous_path,
+      current_path,
+      next_path,
     },
   };
 

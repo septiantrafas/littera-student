@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { useTimeStore } from "providers/RootStoreProvider";
+import { useNavigationStore, useTimeStore } from "providers/RootStoreProvider";
 
 import { Flex, Text, useColorModeValue as mode } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/toast";
@@ -13,18 +13,21 @@ dayjs.extend(utc);
 
 export const TimeKeeper = observer(() => {
   const [isReminded, setIsReminded] = useState(false);
-  const store = useTimeStore();
+  const timeStore = useTimeStore();
+  const navigationStore = useNavigationStore();
   const router = useRouter();
   const toast = useToast();
   const toast_id = "time-reminder";
 
   useEffect(() => {
     setTimeout(() => {
-      const timeLeft = store.calculateTimeLeft(store.TIME);
+      const timeLeft = timeStore.calculateTimeLeft(timeStore.TIME);
 
       // console.log("timeleft: ", timeLeft.unix());
       if (timeLeft.unix() > 0) {
-        store.updateTime(dayjs(store.TIME).add(1, "seconds").toISOString());
+        timeStore.updateTime(
+          dayjs(timeStore.TIME).add(1, "seconds").toISOString()
+        );
         document.getElementById("time").innerHTML = timeLeft.format("HH:mm:ss");
 
         if (timeLeft.unix() < 60 && !isReminded && !toast.isActive(toast_id)) {
@@ -42,12 +45,13 @@ export const TimeKeeper = observer(() => {
         }
       } else {
         document.getElementById("time").innerHTML = "00:00:00";
+        navigationStore.clearStore();
         setIsReminded(false);
         router.push({
           pathname: "/[package]/[section]",
           query: {
-            package: store.TIMEOUT_PATH.package,
-            section: store.TIMEOUT_PATH.section,
+            package: timeStore.TIMEOUT_PATH.package,
+            section: timeStore.TIMEOUT_PATH.section,
           },
         });
       }
@@ -55,12 +59,12 @@ export const TimeKeeper = observer(() => {
     return () => {
       clearTimeout();
     };
-  }, [store.TIME]);
+  }, [timeStore.TIME]);
 
   // push to lobby if exam is not started
   useEffect(() => {
-    const now = dayjs(store.TIME);
-    const start_time = dayjs(store.START_TIME);
+    const now = dayjs(timeStore.TIME);
+    const start_time = dayjs(timeStore.START_TIME);
 
     if (now.isBefore(start_time)) {
       // console.log("This section is not started yet");
