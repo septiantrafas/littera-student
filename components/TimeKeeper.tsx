@@ -22,7 +22,7 @@ export const TimeKeeper = observer(() => {
     setTimeout(() => {
       const timeLeft = store.calculateTimeLeft(store.TIME);
 
-      console.log("timeleft: ", timeLeft.unix());
+      // console.log("timeleft: ", timeLeft.unix());
       if (timeLeft.unix() > 0) {
         store.updateTime(dayjs(store.TIME).add(1, "seconds").toISOString());
         document.getElementById("time").innerHTML = timeLeft.format("HH:mm:ss");
@@ -63,7 +63,7 @@ export const TimeKeeper = observer(() => {
     const start_time = dayjs(store.START_TIME);
 
     if (now.isBefore(start_time)) {
-      console.log("This section is not started yet");
+      // console.log("This section is not started yet");
       router.push({
         pathname: "/[package]/[section]",
         query: {

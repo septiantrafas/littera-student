@@ -303,7 +303,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
       previous_path,
     },
   };
-  console.log(hydrationData);
+
   // Pass data to the page via props
   return {
     props: {
