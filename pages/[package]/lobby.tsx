@@ -10,6 +10,7 @@ import { GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
 import { supabase } from "utils/initSupabase";
 import { useRouter } from "next/router";
 import { UrlObject } from "url";
+import { useNavigationStore } from "providers/RootStoreProvider";
 
 type ILobbyProps = {
   paths: {
@@ -30,6 +31,7 @@ type LobbyState = {
 
 const Lobby: React.FC<ILobbyProps> = ({ paths }) => {
   const router = useRouter();
+  const navigationStore = useNavigationStore();
   const isDevelopment = process.env.NEXT_PUBLIC_ENVIRONMENT === "development";
 
   const [{ isEligible, redirectPath }, setState] = useState<LobbyState>({
@@ -92,13 +94,15 @@ const Lobby: React.FC<ILobbyProps> = ({ paths }) => {
       }, 25000);
 
       setTimeout(() => {
-        router.push({
+        const current_path = navigationStore.CURRENT_PATH.params;
+        const path = {
           pathname: "/[package]/[section]",
           query: {
-            package: paths.package.id,
-            section: paths.id,
+            package: current_path.package,
+            section: current_path.section,
           },
-        });
+        };
+        router.push(current_path ? path : redirectPath);
       }, 35000);
     }
   }, []);
