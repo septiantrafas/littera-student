@@ -30,6 +30,7 @@ import {
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 import { stat } from "fs/promises";
+import { RequirementCheck } from "@/components/RequirementCheck";
 
 type PackageRouteResponse = {
   id: string;
@@ -184,75 +185,71 @@ const Home: React.FC = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Flex
-        direction="column"
-        ml="6"
-        minH="90vh"
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Box maxW="40%">
-          <Box alignItems="flex-end" mb="6">
-            <Heading size="lg">Halo! 👋</Heading>
-            <Skeleton mt="1" isLoaded={data && !error}>
-              <Text color="gray.400">
-                {data ? data.email + ", " : ""} kamu diundang untuk mengikuti:
-              </Text>
-            </Skeleton>
-          </Box>
-
-          {!schedules.length && (
-            <Box py="20" px="4" bg="gray.100" borderRadius="lg">
-              <Text color="gray.400" textAlign="center">
-                No Invite
-              </Text>
-            </Box>
-          )}
-          {schedules &&
-            schedules.map(({ schedule }) => (
-              <Box
-                key={schedule.name}
-                borderWidth="1px"
-                borderColor="gray.200"
-                borderRadius="lg"
-                shadow="base"
-                bg="white"
-                p="6"
-              >
-                <Heading fontSize="2xl">{schedule.name}</Heading>
+      <Flex minH="90vh" w="full" justifyContent="center" mt="6">
+        <Flex maxW={{ base: "full", "2xl": "5xl" }} mx="6">
+          <RequirementCheck />
+          <Box w="50%" mx="8">
+            <Box alignItems="flex-end" mb="6">
+              <Heading size="lg">Jadwal</Heading>
+              <Skeleton mt="1" isLoaded={data && !error}>
                 <Text color="gray.400">
-                  Dimulai pada{" "}
-                  {dayjs(schedule.exam_date).format("DD MMM YYYY - HH:mm")}
+                  {data ? data.email + ", " : ""} kamu diundang untuk mengikuti:
                 </Text>
-                <Flex mt="4">
-                  <NextLink
-                    href={`/${encodeURIComponent(schedule.package_id)}/lobby`}
-                    passHref
-                  >
-                    <Button
-                      mt="4"
-                      size="sm"
-                      rightIcon={<HiArrowRight />}
-                      colorScheme="blue"
-                    >
-                      Ikuti Asesmen
-                    </Button>
-                  </NextLink>
-                </Flex>
+              </Skeleton>
+            </Box>
+
+            {!schedules.length && (
+              <Box py="20" px="4" bg="gray.100" borderRadius="lg">
+                <Text color="gray.400" textAlign="center">
+                  No Invite
+                </Text>
               </Box>
-            ))}
-          <Flex direction="column" mt="4">
-            <Button
-              size="sm"
-              variant="ghost"
-              colorScheme="red"
-              rightIcon={<HiLogout />}
-              onClick={() => supabase.auth.signOut()}
-            >
-              Keluar
-            </Button>
-          </Flex>
-        </Box>
+            )}
+            {schedules &&
+              schedules.map(({ schedule }) => (
+                <Box
+                  key={schedule.name}
+                  borderWidth="1px"
+                  borderColor="gray.200"
+                  borderRadius="lg"
+                  bg="white"
+                  p="6"
+                >
+                  <Heading fontSize="2xl">{schedule.name}</Heading>
+                  <Text color="gray.400">
+                    Dimulai pada{" "}
+                    {dayjs(schedule.exam_date).format("DD MMM YYYY - HH:mm")}
+                  </Text>
+                  <Flex mt="4">
+                    <NextLink
+                      href={`/${encodeURIComponent(schedule.package_id)}/lobby`}
+                      passHref
+                    >
+                      <Button
+                        mt="4"
+                        size="sm"
+                        rightIcon={<HiArrowRight />}
+                        colorScheme="blue"
+                      >
+                        Ikuti Asesmen
+                      </Button>
+                    </NextLink>
+                  </Flex>
+                </Box>
+              ))}
+            <Flex direction="column" mt="4">
+              <Button
+                size="sm"
+                variant="ghost"
+                colorScheme="red"
+                rightIcon={<HiLogout />}
+                onClick={() => supabase.auth.signOut()}
+              >
+                Keluar
+              </Button>
+            </Flex>
+          </Box>
+        </Flex>
       </Flex>
     </div>
   );
