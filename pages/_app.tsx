@@ -11,6 +11,7 @@ import NProgress from "nprogress";
 import Router from "next/router";
 import Head from "next/head";
 
+import "focus-visible/dist/focus-visible";
 import "styles/supabase.css";
 import "styles/globals.css";
 
