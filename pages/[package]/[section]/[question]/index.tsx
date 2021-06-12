@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import PageWithLayoutType from "@/types/pageWithLayout";
 import QuestionNavigator from "@/components/QuestionNavigator";
@@ -21,6 +21,7 @@ import { useNavigationStore, useTimeStore } from "providers/RootStoreProvider";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
+import ReactHtmlParser from "react-html-parser";
 
 type IQuestionsPath = {
   id: string;
@@ -40,7 +41,7 @@ type IQuestionsResponse = {
   number: number;
   text?: string;
   question: string;
-  options: string[];
+  options: any;
   created_at: string;
   updated_at: string;
 };
@@ -51,13 +52,15 @@ type IQuestionProps = {
   number: number;
   text?: string;
   question: string;
-  options: string[];
+  options: any;
 };
 
 const ExamQuestionPage = (props: IQuestionProps) => {
   const store = useNavigationStore();
   const time = useTimeStore();
   const router = useRouter();
+
+  const [isOptionsUseImage, setOptionsUseImage] = useState(false);
 
   useEffect(() => {
     if (!time.END_TIME) {
@@ -72,27 +75,59 @@ const ExamQuestionPage = (props: IQuestionProps) => {
   }, [time.END_TIME]);
 
   useEffect(() => {
+    const imageNodeName =
+      document.getElementById("htmlRenderer").childNodes[0].childNodes[0]
+        .nodeName;
+    const isImageExist = imageNodeName.toLowerCase() === "img";
+
+    setOptionsUseImage(isImageExist);
+    console.log(imageNodeName);
+    console.log(isImageExist);
+  }, []);
+
+  useEffect(() => {
     const position = store.paths.findIndex(
       (arr) => arr.params.question.id === props.id
     );
+
     const id = store.paths[position].params.question.id;
     store.addToVisitedIndex(id);
   }, [store.paths, props.id]);
 
+  // TODO : REFACTOR THIS TO COMPONENT BASED
   return (
     <Flex height="95vh" bg={mode("white", "trueGray.800")}>
       <QuestionNavigator id={props.id} />
-      <Box w="50%" px="10" py="12" overflow="scroll">
-        <Text>
-          {!props.text && `${props.number}. ${props.question}`}
-          {props.text}
+      <Box
+        w={isOptionsUseImage ? "0%" : "50%"}
+        px="10"
+        py="12"
+        overflow="scroll"
+      >
+        <Text className="options-with-image">
+          {!props.text && ReactHtmlParser(props.question)}
+          {ReactHtmlParser(props.text)}
         </Text>
       </Box>
-      <Box w="50%" px="10" py="12" justifyContent="space-between">
-        <Box maxW={{ xl: "2xl", "2xl": "3xl" }} mx="auto">
-          <Text fontWeight="semibold">
-            {props.text && `${props.number}. ${props.question}`}
-            {!props.text && ``}
+      <Box
+        w={isOptionsUseImage ? "100%" : "50%"}
+        px="10"
+        py="12"
+        justifyContent="space-between"
+      >
+        <Box
+          maxW={isOptionsUseImage ? "full" : { xl: "2xl", "2xl": "3xl" }}
+          mx="auto"
+        >
+          <Text
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            fontWeight="semibold"
+            className="options-with-image"
+          >
+            {props.text && ReactHtmlParser(props.question)}
+            {!props.text && ReactHtmlParser(props.question)}
           </Text>
           <RadioGroup
             onChange={(value: number) =>
@@ -104,16 +139,19 @@ const ExamQuestionPage = (props: IQuestionProps) => {
             value={store.getSelectedOption(props.id)}
             mt="6"
           >
-            <Stack direction="column" spacing="3">
+            <Flex w="full" direction={isOptionsUseImage ? "row" : "column"}>
               {props.options?.map((item, index) => {
                 const number = index + 1;
                 const isItemSelected =
                   store.getSelectedOption(props.id) === number;
+
                 return (
                   <Box
                     px="6"
+                    mx={isOptionsUseImage ? "4" : "0"}
+                    my={isOptionsUseImage ? "0" : "2"}
                     key={number}
-                    d="flex"
+                    d={isOptionsUseImage ? "block" : "flex"}
                     cursor="pointer"
                     borderWidth="1px"
                     borderRadius="lg"
@@ -174,12 +212,14 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                       }
                       hidden
                     >
-                      {item}
+                      <div id="htmlRenderer" className="options-with-image">
+                        {ReactHtmlParser(item.value)}
+                      </div>
                     </Radio>
                   </Box>
                 );
               })}
-            </Stack>
+            </Flex>
           </RadioGroup>
         </Box>
         <Flex mt="4" w="full" alignItems="flex-end">
@@ -239,9 +279,28 @@ const ExamQuestionPage = (props: IQuestionProps) => {
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
+  const query = `
+  id,
+    sections:section_id (
+        id,
+        packages:package_id ( 
+          id 
+        ) 
+    )
+  `;
+
+  const res = await supabase.from<any>("questions").select(query);
+  const paths = res.data.map((question) => ({
+    params: {
+      package: question.sections.packages.id.toString(),
+      section: question.sections.id,
+      question: question.id,
+    },
+  }));
+
   return {
-    paths: [],
-    fallback: true,
+    paths,
+    fallback: false,
   };
 };
 
@@ -290,6 +349,9 @@ export const getStaticProps: GetStaticProps = async (context) => {
     .single();
 
   const data = res.data;
+  const options = JSON.parse(data.options);
+
+  // console.log(options[0].value);
 
   const hydrationData = {
     navigationStore: {
@@ -309,9 +371,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
       number: data.number,
       text: data.text,
       question: data.question,
-      options: data.options,
+      options: options,
     },
-    revalidate: 3600,
   };
 };
 

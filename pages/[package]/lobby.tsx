@@ -4,7 +4,14 @@ import React, { useEffect, useState } from "react";
 import PageWithLayoutType from "@/types/pageWithLayout";
 
 import Default from "@/layouts/default";
-import { Box, Flex, Progress, Spinner, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Progress,
+  Spinner,
+  systemProps,
+  Text,
+} from "@chakra-ui/react";
 import { HiOutlineExclamation } from "react-icons/hi";
 import { GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
 import { supabase } from "utils/initSupabase";
@@ -29,44 +36,31 @@ type LobbyState = {
   redirectPath: string | UrlObject;
 };
 
-const Lobby: React.FC<ILobbyProps> = ({ paths }) => {
+const Lobby: React.FC<ILobbyProps> = (props) => {
+  const { paths } = props;
+
   const router = useRouter();
   const navigationStore = useNavigationStore();
   const isDevelopment = process.env.NEXT_PUBLIC_ENVIRONMENT === "development";
 
-  const [{ isEligible, redirectPath }, setState] = useState<LobbyState>({
-    isEligible: false,
-    redirectPath: "/verification",
+  // const [{ isEligible, redirectPath }, setState] = useState<LobbyState>({
+  //   isEligible: false,
+  //   redirectPath: "/verification",
+  // });
+
+  const [redirectPath, setRedirectPath] = useState<string | UrlObject>({
+    pathname: "/[package]/[section]",
+    query: {
+      package: paths.package.id,
+      section: paths.id,
+    },
   });
 
   const [progress, setProgress] = useState(10);
   const [status, setStatus] = useState("Establishing connection...");
 
   useEffect(() => {
-    if (isEligible) {
-      setState((prevState) => {
-        return {
-          ...prevState,
-          redirectPath: {
-            pathname: "/[package]/[section]",
-            query: {
-              package: paths.package.id,
-              section: paths.id,
-            },
-          },
-        };
-      });
-    }
-  }, [isEligible]);
-
-  // useEffect(() => {
-  //   if (isStarted) {
-  //     router.push(redirectPath)
-  //   }
-  // }, [isStarted])
-
-  useEffect(() => {
-    if (isDevelopment) {
+    if (isDevelopment && paths) {
       setTimeout(() => {
         setStatus("Checking your internet speed...");
         setProgress(20);
@@ -94,18 +88,11 @@ const Lobby: React.FC<ILobbyProps> = ({ paths }) => {
       }, 25000);
 
       setTimeout(() => {
-        const current_path = navigationStore.CURRENT_PATH.params;
-        const path = {
-          pathname: "/[package]/[section]",
-          query: {
-            package: current_path.package,
-            section: current_path.section,
-          },
-        };
-        router.push(current_path ? path : redirectPath);
+        console.log("redirectPath:", redirectPath);
+        router.push(redirectPath);
       }, 35000);
     }
-  }, []);
+  }, [redirectPath]);
 
   return (
     <>
@@ -166,12 +153,12 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     .limit(1);
 
   const data = res.data[0];
+  console.log(data);
   // Pass data to the page via props
   return {
     props: {
       paths: data,
     },
-    revalidate: 3600,
   };
 };
 

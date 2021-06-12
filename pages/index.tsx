@@ -115,7 +115,7 @@ const Home: React.FC = () => {
         const res = await supabase
           .from<any>("participants")
           .select(query)
-          .match({ profiles_id: user.id });
+          .match({ profile_id: user.id });
 
         if (res.data.length) {
           setSchedules(res.data);
