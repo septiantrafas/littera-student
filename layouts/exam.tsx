@@ -71,20 +71,20 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
         justifyContent="space-between"
         alignItems="center"
         direction="row"
-        p="4"
+        p="2"
         borderBottomWidth="1px"
       >
-        <Logo h="6" iconColor={mode("gray.900", "gray.200")} />
+        <Logo ml="2" h="4" iconColor={mode("gray.900", "gray.200")} />
         <Flex alignItems="center">
           <TimeKeeper />
-          <IconButton
+          {/* <IconButton
             aria-label={
               colorMode === "light" ? "Toggle dark mode" : "Toggle light mode"
             }
             icon={colorMode === "light" ? <HiMoon /> : <HiSun />}
             onClick={toggleColorMode}
             ml="2"
-          />
+          /> */}
         </Flex>
       </Flex>
       {children}

@@ -7,7 +7,11 @@ import { CypressStoreProvider } from "providers/CypressStoreProvider";
 import { RootStoreProvider } from "../providers/RootStoreProvider";
 import { Auth } from "@supabase/ui";
 import { supabase } from "utils/initSupabase";
+import NProgress from "nprogress";
+import Router from "next/router";
+import Head from "next/head";
 
+import "focus-visible/dist/focus-visible";
 import "styles/supabase.css";
 import "styles/globals.css";
 
@@ -15,6 +19,14 @@ type AppLayoutProps = {
   Component: PageWithLayoutType;
   pageProps: any;
 };
+
+Router.events.on("routeChangeStart", (url) => {
+  NProgress.start();
+});
+
+Router.events.on("routeChangeComplete", () => NProgress.done());
+
+Router.events.on("routeChangeError", () => NProgress.done());
 
 class MyApp extends App<AppLayoutProps> {
   render() {
@@ -28,6 +40,10 @@ class MyApp extends App<AppLayoutProps> {
           <Auth.UserContextProvider supabaseClient={supabase}>
             <RootStoreProvider hydrationData={pageProps.hydrationData}>
               <CypressStoreProvider />
+              <Head>
+                {/* Import CSS for nprogress */}
+                <link rel="stylesheet" type="text/css" href="/nprogress.css" />
+              </Head>
               {!Component.layout ? (
                 <Component {...pageProps} />
               ) : (

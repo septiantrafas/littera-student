@@ -1,6 +1,8 @@
 import { makeAutoObservable } from "mobx";
 import { enableStaticRendering } from "mobx-react";
 import { RootStore } from "@/stores/RootStore";
+import { persistStore } from "utils/persistStore";
+import { clearPersist } from "mobx-persist-store";
 
 const isServer = typeof window === "undefined";
 // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -24,8 +26,9 @@ type AnsweredIndex = {
 
 export type PathsHydration = {
   paths?: [];
-  next_path?: Paths;
   previous_path?: Paths;
+  current_path?: Paths;
+  next_path?: Paths;
   visited_index?: [];
 };
 
@@ -34,18 +37,32 @@ export class NavigationStore {
   PATHS: Paths[];
   VISITED_INDEX: string[] = [];
   ANSWERED_INDEX: AnsweredIndex[] = [];
-  NEXT_PATH: Paths;
   PREVIOUS_PATH: Paths;
+  CURRENT_PATH: Paths;
+  NEXT_PATH: Paths;
 
   constructor(root: RootStore) {
     this.root = root;
     makeAutoObservable(this);
+    persistStore(this, ["ANSWERED_INDEX", "CURRENT_PATH"], "NavigationStore");
   }
+
+  clearStore = () => {
+    try {
+      this.ANSWERED_INDEX = [];
+      clearPersist(this);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
 
   hydrate(data: PathsHydration) {
     this.PATHS = data.paths != null ? data.paths : [];
-    this.NEXT_PATH = data.next_path != null ? data.next_path : null;
     this.PREVIOUS_PATH = data.previous_path != null ? data.previous_path : null;
+    this.CURRENT_PATH = data.current_path != null ? data.current_path : null;
+    this.NEXT_PATH = data.next_path != null ? data.next_path : null;
   }
 
   get paths() {
@@ -73,7 +90,6 @@ export class NavigationStore {
   }
 
   isVisited(index: string) {
-    console.log(this.VISITED_INDEX.toString());
     return this.VISITED_INDEX.includes(index);
   }
 
@@ -95,7 +111,6 @@ export class NavigationStore {
   }
 
   setAnsweredIndex(index: AnsweredIndex) {
-    console.log(JSON.stringify(this.ANSWERED_INDEX));
     if (!this.isAnswered(index.question_id)) {
       this.ANSWERED_INDEX.push(index);
     } else {

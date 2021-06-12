@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { GetStaticPaths, GetStaticPropsResult } from "next";
 import { observer } from "mobx-react-lite";
@@ -14,22 +14,6 @@ import NextLink from "next/link";
 
 dayjs.extend(timezone);
 
-type IStaticPath = {
-  id: string;
-  packages: { id: string };
-};
-
-type ISectionsPath = {
-  id: string;
-  sections: {
-    id: string;
-    number: number;
-    packages: {
-      id: string;
-    };
-  };
-};
-
 type ISectionResponse = {
   id: string;
   number: number;
@@ -41,10 +25,6 @@ type ISectionResponse = {
     start_time: string;
     end_time: string;
   };
-};
-
-type ISectionUrl = {
-  section: string;
 };
 
 type ISectionProps = {
@@ -67,6 +47,7 @@ type ISectionProps = {
 };
 
 const ExamCategoryPage = (props: ISectionProps) => {
+  const [redirectPath, setRedirectPath] = useState({});
   const store = useTimeStore();
   const navigation = useNavigationStore();
   const router = useRouter();
@@ -74,6 +55,20 @@ const ExamCategoryPage = (props: ISectionProps) => {
   const start_time = dayjs(props.start_time);
   const end_time = dayjs(props.end_time);
   const duration = end_time.diff(start_time, "minutes");
+
+  //FIXME: When changed back to ISR, this code block should be moved
+  useEffect(() => {
+    if (navigation.next_path) {
+      setRedirectPath({
+        pathname: "/[package]/[section]/[question]",
+        query: {
+          package: navigation.next_path.params.package,
+          section: navigation.next_path.params.section,
+          question: navigation.next_path.params.question.id,
+        },
+      });
+    }
+  }, [navigation.next_path]);
 
   return (
     <>
@@ -92,20 +87,11 @@ const ExamCategoryPage = (props: ISectionProps) => {
         <Text>{props.context}</Text>
       </Box>
       <Box mx="20" mb="6">
-        <Text fontSize="lg" fontWeight="semibold">
+        {/* <Text fontSize="lg" fontWeight="semibold">
           Contoh Soal
         </Text>
-        <Text>{props.context}</Text>
-        <NextLink
-          href={{
-            pathname: "/[package]/[section]/[question]",
-            query: {
-              package: navigation.next_path.params.package,
-              section: navigation.next_path.params.section,
-              question: navigation.next_path.params.question.id,
-            },
-          }}
-        >
+        <Text>{props.context}</Text> */}
+        <NextLink href={redirectPath}>
           <Button data-cy="start-button" mt="6">
             Start
           </Button>
@@ -115,14 +101,14 @@ const ExamCategoryPage = (props: ISectionProps) => {
   );
 };
 
-export const getStaticPaths: GetStaticPaths<ISectionUrl> = async () => {
+export const getStaticPaths: GetStaticPaths = async () => {
   const query = `
     id,
     packages:package_id ( id ) 
   )
   `;
 
-  const res = await supabase.from<IStaticPath>("sections").select(query);
+  const res = await supabase.from<any>("sections").select(query);
   const paths = res.data.map((section) => ({
     params: {
       package: section.packages.id,
@@ -182,6 +168,7 @@ export const getStaticProps = async ({
 
   const data = res.data[0];
   const sections = data.sections;
+  console.log(data);
 
   const next_path = {
     params: {

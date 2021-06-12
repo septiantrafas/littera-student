@@ -12,6 +12,11 @@ yarn dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Environment
+
+**Production**: strict settings applied, served from our main branch
+**Preview**: for live-demo purposes, served from development branch
+
 ## Learn More
 
 To learn more about Littera Student App, take a look at the following resources:

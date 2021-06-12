@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import PageWithLayoutType from "@/types/pageWithLayout";
 import QuestionNavigator from "@/components/QuestionNavigator";
@@ -12,25 +12,16 @@ import {
   Stack,
   Text,
   Flex,
-  Divider,
+  Button,
 } from "@chakra-ui/react";
 import { observer } from "mobx-react";
 import { supabase } from "utils/initSupabase";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { useNavigationStore, useTimeStore } from "providers/RootStoreProvider";
 import { useRouter } from "next/router";
-
-type IStaticPath = {
-  id: string;
-  sections: {
-    id: string;
-    packages: { id: string };
-  };
-};
-
-type ISectionUrl = {
-  question: string;
-};
+import NextLink from "next/link";
+import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
+import ReactHtmlParser from "react-html-parser";
 
 type IQuestionsPath = {
   id: string;
@@ -48,28 +39,28 @@ type IQuestionsResponse = {
   id: string;
   section_id: string;
   number: number;
+  text?: string;
   question: string;
-  options: string[];
+  options: any;
   created_at: string;
   updated_at: string;
-};
-
-type IQuestionsUrl = {
-  question: string;
 };
 
 type IQuestionProps = {
   id: string;
   section_id: string;
   number: number;
+  text?: string;
   question: string;
-  options: string[];
+  options: any;
 };
 
 const ExamQuestionPage = (props: IQuestionProps) => {
   const store = useNavigationStore();
   const time = useTimeStore();
   const router = useRouter();
+
+  const [isOptionsUseImage, setOptionsUseImage] = useState(false);
 
   useEffect(() => {
     if (!time.END_TIME) {
@@ -84,26 +75,59 @@ const ExamQuestionPage = (props: IQuestionProps) => {
   }, [time.END_TIME]);
 
   useEffect(() => {
+    const imageNodeName =
+      document.getElementById("htmlRenderer").childNodes[0].childNodes[0]
+        .nodeName;
+    const isImageExist = imageNodeName.toLowerCase() === "img";
+
+    setOptionsUseImage(isImageExist);
+    console.log(imageNodeName);
+    console.log(isImageExist);
+  }, []);
+
+  useEffect(() => {
     const position = store.paths.findIndex(
       (arr) => arr.params.question.id === props.id
     );
+
     const id = store.paths[position].params.question.id;
     store.addToVisitedIndex(id);
   }, [store.paths, props.id]);
 
+  // TODO : REFACTOR THIS TO COMPONENT BASED
   return (
-    <Flex height="95vh" justifyContent="center">
+    <Flex height="95vh" bg={mode("white", "trueGray.800")}>
+      <QuestionNavigator id={props.id} />
       <Box
-        position="relative"
-        w="100%"
+        w={isOptionsUseImage ? "0%" : "50%"}
         px="10"
         py="12"
         overflow="scroll"
-        bg={mode("white", "trueGray.800")}
       >
-        <Box maxW={{ xl: "2xl", "2xl": "3xl" }} mx="auto">
-          <Text fontSize="xl" fontWeight="semibold">
-            {props.number}. {props.question}
+        <Text className="options-with-image">
+          {!props.text && ReactHtmlParser(props.question)}
+          {ReactHtmlParser(props.text)}
+        </Text>
+      </Box>
+      <Box
+        w={isOptionsUseImage ? "100%" : "50%"}
+        px="10"
+        py="12"
+        justifyContent="space-between"
+      >
+        <Box
+          maxW={isOptionsUseImage ? "full" : { xl: "2xl", "2xl": "3xl" }}
+          mx="auto"
+        >
+          <Text
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            fontWeight="semibold"
+            className="options-with-image"
+          >
+            {props.text && ReactHtmlParser(props.question)}
+            {!props.text && ReactHtmlParser(props.question)}
           </Text>
           <RadioGroup
             onChange={(value: number) =>
@@ -113,21 +137,24 @@ const ExamQuestionPage = (props: IQuestionProps) => {
               })
             }
             value={store.getSelectedOption(props.id)}
-            mt="10"
+            mt="6"
           >
-            <Stack direction="column" spacing="5">
-              {props.options.map((item, index) => {
+            <Flex w="full" direction={isOptionsUseImage ? "row" : "column"}>
+              {props.options?.map((item, index) => {
                 const number = index + 1;
                 const isItemSelected =
                   store.getSelectedOption(props.id) === number;
+
                 return (
                   <Box
                     px="6"
+                    mx={isOptionsUseImage ? "4" : "0"}
+                    my={isOptionsUseImage ? "0" : "2"}
                     key={number}
-                    d="flex"
+                    d={isOptionsUseImage ? "block" : "flex"}
                     cursor="pointer"
                     borderWidth="1px"
-                    borderRadius="xl"
+                    borderRadius="lg"
                     bg={
                       isItemSelected
                         ? mode("blue.50", "gray.800")
@@ -159,7 +186,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                     }}
                   >
                     <Text
-                      fontSize="5xl"
+                      fontSize="3xl"
                       fontWeight="bold"
                       textColor={
                         isItemSelected
@@ -173,9 +200,10 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                       {String.fromCharCode("a".charCodeAt(0) + index)}
                     </Text>
                     <Radio
-                      my="10"
+                      my="4"
                       value={number}
                       cursor="pointer"
+                      size="md"
                       onClick={() =>
                         store.setAnsweredIndex({
                           question_id: props.id,
@@ -184,28 +212,73 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                       }
                       hidden
                     >
-                      {item}
+                      <div id="htmlRenderer" className="options-with-image">
+                        {ReactHtmlParser(item.value)}
+                      </div>
                     </Radio>
                   </Box>
                 );
               })}
-            </Stack>
+            </Flex>
           </RadioGroup>
         </Box>
-      </Box>
-      <Divider orientation="vertical" />
-      <Box
-        w={{ xl: "30%", "2xl": "25%" }}
-        bg={mode("gray.50", "trueGray.900")}
-        justifyContent="space-between"
-      >
-        <QuestionNavigator id={props.id} />
+        <Flex mt="4" w="full" alignItems="flex-end">
+          <Flex w="full" alignItems="center" justifyContent="space-between">
+            <NextLink
+              href={
+                store.previous_path
+                  ? {
+                      pathname: "/[package]/[section]/[question]",
+                      query: {
+                        package: store.previous_path.params.package,
+                        section: store.previous_path.params.section,
+                        question: store.previous_path.params.question.id,
+                      },
+                    }
+                  : ""
+              }
+            >
+              <Button
+                variant="ghost"
+                textColor="gray.600"
+                leftIcon={<HiChevronLeft />}
+                isDisabled={!store.previous_path}
+              >
+                Back
+              </Button>
+            </NextLink>
+
+            <NextLink
+              href={
+                store.next_path
+                  ? {
+                      pathname: "/[package]/[section]/[question]",
+                      query: {
+                        package: store.next_path.params.package,
+                        section: store.next_path.params.section,
+                        question: store.next_path.params.question.id,
+                      },
+                    }
+                  : ""
+              }
+            >
+              <Button
+                variant="ghost"
+                textColor="gray.600"
+                rightIcon={<HiChevronRight />}
+                isDisabled={!store.next_path}
+              >
+                Next
+              </Button>
+            </NextLink>
+          </Flex>
+        </Flex>
       </Box>
     </Flex>
   );
 };
 
-export const getStaticPaths: GetStaticPaths<ISectionUrl> = async () => {
+export const getStaticPaths: GetStaticPaths = async () => {
   const query = `
   id,
     sections:section_id (
@@ -216,7 +289,7 @@ export const getStaticPaths: GetStaticPaths<ISectionUrl> = async () => {
     )
   `;
 
-  const res = await supabase.from<IStaticPath>("questions").select(query);
+  const res = await supabase.from<any>("questions").select(query);
   const paths = res.data.map((question) => ({
     params: {
       package: question.sections.packages.id.toString(),
@@ -265,8 +338,9 @@ export const getStaticProps: GetStaticProps = async (context) => {
     (arr) => arr.params.question.id === context.params.question.toString()
   );
 
-  const next_path = paths[position + 1] ? paths[position + 1] : null;
   const previous_path = paths[position - 1] ? paths[position - 1] : null;
+  const current_path = paths[position];
+  const next_path = paths[position + 1] ? paths[position + 1] : null;
 
   const res = await supabase
     .from<IQuestionsResponse>("questions")
@@ -275,14 +349,19 @@ export const getStaticProps: GetStaticProps = async (context) => {
     .single();
 
   const data = res.data;
+  const options = JSON.parse(data.options);
+
+  // console.log(options[0].value);
 
   const hydrationData = {
     navigationStore: {
       paths,
-      next_path,
       previous_path,
+      current_path,
+      next_path,
     },
   };
+
   // Pass data to the page via props
   return {
     props: {
@@ -290,8 +369,9 @@ export const getStaticProps: GetStaticProps = async (context) => {
       id: data.id,
       section_id: data.section_id,
       number: data.number,
+      text: data.text,
       question: data.question,
-      options: data.options,
+      options: options,
     },
   };
 };
