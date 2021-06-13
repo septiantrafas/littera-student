@@ -127,7 +127,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
             className="options-with-image"
           >
             {props.text && ReactHtmlParser(props.question)}
-            {!props.text && ReactHtmlParser(props.question)}
+            {!props.text && ``}
           </Text>
           <RadioGroup
             onChange={(value: number) =>
