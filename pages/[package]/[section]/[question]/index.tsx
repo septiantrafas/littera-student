@@ -13,6 +13,7 @@ import {
   Text,
   Flex,
   Button,
+  Spinner,
 } from "@chakra-ui/react";
 import { observer } from "mobx-react";
 import { supabase } from "utils/initSupabase";
@@ -59,6 +60,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
   const store = useNavigationStore();
   const time = useTimeStore();
   const router = useRouter();
+  const { isFallback } = useRouter();
 
   const [isOptionsUseImage, setOptionsUseImage] = useState(false);
 
@@ -83,7 +85,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
     setOptionsUseImage(isImageExist);
     console.log(imageNodeName);
     console.log(isImageExist);
-  }, []);
+  }, [isFallback]);
 
   useEffect(() => {
     const position = store.paths.findIndex(
@@ -94,7 +96,15 @@ const ExamQuestionPage = (props: IQuestionProps) => {
     store.addToVisitedIndex(id);
   }, [store.paths, props.id]);
 
-  // TODO : REFACTOR THIS TO COMPONENT BASED
+  if (isFallback) {
+    return (
+      <>
+        <Spinner size="lg" />
+      </>
+    );
+  }
+
+  // TODO: REFACTOR THIS TO COMPONENT BASED
   return (
     <Flex height="95vh" bg={mode("white", "trueGray.800")}>
       <QuestionNavigator id={props.id} />
@@ -130,10 +140,10 @@ const ExamQuestionPage = (props: IQuestionProps) => {
             {!props.text && ``}
           </Text>
           <RadioGroup
-            onChange={(value: number) =>
+            onChange={(nextValue) =>
               store.setAnsweredIndex({
                 question_id: props.id,
-                option_id: value,
+                option_id: parseFloat(nextValue),
               })
             }
             value={store.getSelectedOption(props.id)}
@@ -279,28 +289,9 @@ const ExamQuestionPage = (props: IQuestionProps) => {
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const query = `
-  id,
-    sections:section_id (
-        id,
-        packages:package_id ( 
-          id 
-        ) 
-    )
-  `;
-
-  const res = await supabase.from<any>("questions").select(query);
-  const paths = res.data.map((question) => ({
-    params: {
-      package: question.sections.packages.id.toString(),
-      section: question.sections.id,
-      question: question.id,
-    },
-  }));
-
   return {
-    paths,
-    fallback: false,
+    paths: [],
+    fallback: true,
   };
 };
 
@@ -363,17 +354,23 @@ export const getStaticProps: GetStaticProps = async (context) => {
   };
 
   // Pass data to the page via props
-  return {
-    props: {
-      hydrationData,
-      id: data.id,
-      section_id: data.section_id,
-      number: data.number,
-      text: data.text,
-      question: data.question,
-      options: options,
-    },
-  };
+  try {
+    return {
+      props: {
+        hydrationData,
+        id: data.id,
+        section_id: data.section_id,
+        number: data.number,
+        text: data.text,
+        question: data.question,
+        options: options,
+      },
+      revalidate: 60,
+    };
+  } catch (error) {
+    console.error(error);
+    return { notFound: true };
+  }
 };
 
 (ExamQuestionPage as PageWithLayoutType).layout = Exam;

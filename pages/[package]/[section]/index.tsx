@@ -6,7 +6,7 @@ import { observer } from "mobx-react-lite";
 
 import Exam from "@/layouts/exam";
 import PageWithLayoutType from "@/types/pageWithLayout";
-import { Box, Button, Text } from "@chakra-ui/react";
+import { Box, Button, Spinner, Text } from "@chakra-ui/react";
 import { useNavigationStore, useTimeStore } from "providers/RootStoreProvider";
 import { supabase } from "utils/initSupabase";
 import timezone from "dayjs/plugin/timezone";
@@ -47,18 +47,18 @@ type ISectionProps = {
 };
 
 const ExamCategoryPage = (props: ISectionProps) => {
-  const [redirectPath, setRedirectPath] = useState({});
   const store = useTimeStore();
+  const { route, isFallback } = useRouter();
   const navigation = useNavigationStore();
-  const router = useRouter();
+
+  const [redirectPath, setRedirectPath] = useState({});
 
   const start_time = dayjs(props.start_time);
   const end_time = dayjs(props.end_time);
   const duration = end_time.diff(start_time, "minutes");
 
-  //FIXME: When changed back to ISR, this code block should be moved
   useEffect(() => {
-    if (navigation.next_path) {
+    if (!isFallback) {
       setRedirectPath({
         pathname: "/[package]/[section]/[question]",
         query: {
@@ -68,7 +68,15 @@ const ExamCategoryPage = (props: ISectionProps) => {
         },
       });
     }
-  }, [navigation.next_path]);
+  }, [isFallback]);
+
+  if (isFallback) {
+    return (
+      <>
+        <Spinner size="lg" />
+      </>
+    );
+  }
 
   return (
     <>
@@ -102,23 +110,9 @@ const ExamCategoryPage = (props: ISectionProps) => {
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const query = `
-    id,
-    packages:package_id ( id ) 
-  )
-  `;
-
-  const res = await supabase.from<any>("sections").select(query);
-  const paths = res.data.map((section) => ({
-    params: {
-      package: section.packages.id,
-      section: section.id,
-    },
-  }));
-
   return {
-    paths,
-    fallback: false,
+    paths: [],
+    fallback: true,
   };
 };
 
@@ -168,7 +162,6 @@ export const getStaticProps = async ({
 
   const data = res.data[0];
   const sections = data.sections;
-  console.log(data);
 
   const next_path = {
     params: {
@@ -194,18 +187,27 @@ export const getStaticProps = async ({
       timeout_path: next_section_url,
     },
   };
+
   // Pass data to the page via props
-  return {
-    props: {
-      hydrationData,
-      id: sections.id,
-      number: sections.number,
-      title: sections.titles,
-      context: sections.context,
-      start_time: sections.start_time,
-      end_time: sections.end_time,
-    },
-  };
+  try {
+    return {
+      props: {
+        hydrationData,
+        id: sections.id,
+        number: sections.number,
+        title: sections.titles,
+        context: sections.context,
+        start_time: sections.start_time,
+        end_time: sections.end_time,
+      },
+      revalidate: 60,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      notFound: true,
+    };
+  }
 };
 
 (ExamCategoryPage as PageWithLayoutType).layout = Exam;
