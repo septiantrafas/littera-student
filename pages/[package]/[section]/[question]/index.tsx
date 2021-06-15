@@ -296,6 +296,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
+  let data = null;
+
   const query = `
   id,
   number,
@@ -333,13 +335,18 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const current_path = paths[position];
   const next_path = paths[position + 1] ? paths[position + 1] : null;
 
-  const res = await supabase
-    .from<IQuestionsResponse>("questions")
-    .select("*")
-    .match({ id: context.params.question.toString() })
-    .single();
+  try {
+    const res = await supabase
+      .from<IQuestionsResponse>("questions")
+      .select("*")
+      .match({ id: context.params.question.toString() })
+      .single();
 
-  const data = res.data;
+    data = res.data;
+  } catch (error) {
+    console.error("response error:", error);
+    return { notFound: true };
+  }
   const options = JSON.parse(data.options);
 
   // console.log(options[0].value);

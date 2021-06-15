@@ -119,17 +119,36 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps = async ({
   params,
 }): Promise<GetStaticPropsResult<ISectionProps>> => {
+  let data = null;
+  let sections = null;
+  let path_res = null;
+
   const query = `
   id,
   number,
   packages:package_id ( id ) 
   )`;
 
-  const path_res = await supabase
-    .from<any>("sections")
-    .select(query)
-    .match({ package_id: params.package })
-    .order("number", { ascending: true });
+  try {
+    path_res = await supabase
+      .from<any>("sections")
+      .select(query)
+      .match({ package_id: params.package })
+      .order("number", { ascending: true });
+
+    const res = await supabase
+      .from<ISectionResponse>("questions")
+      .select("id, number, sections:section_id (*)")
+      .match({ section_id: params.section })
+      .order("number", { ascending: true })
+      .limit(1);
+
+    data = res.data[0];
+    sections = data.sections;
+  } catch (error) {
+    console.error("response error:", error);
+    return { notFound: true };
+  }
 
   const paths = path_res.data.map((data) => ({
     params: {
@@ -152,16 +171,6 @@ export const getStaticProps = async ({
         package: params.package,
         section: "lobby",
       };
-
-  const res = await supabase
-    .from<ISectionResponse>("questions")
-    .select("id, number, sections:section_id (*)")
-    .match({ section_id: params.section })
-    .order("number", { ascending: true })
-    .limit(1);
-
-  const data = res.data[0];
-  const sections = data.sections;
 
   const next_path = {
     params: {

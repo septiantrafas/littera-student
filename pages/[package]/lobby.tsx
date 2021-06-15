@@ -135,32 +135,45 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths: [],
-    fallback: "blocking",
+    fallback: true,
   };
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
+  // TODO: Implement static type for supabase response
+  let data = null;
+
   const query = `
   id,
   package:package_id (id)
   `;
 
-  const res = await supabase
-    .from<any>("sections")
-    .select(query)
-    .match({ package_id: params.package.toString() })
-    .order("number", { ascending: true })
-    .limit(1);
+  try {
+    const res = await supabase
+      .from<any>("sections") // TODO: Implement static type for supabase response
+      .select(query)
+      .match({ package_id: params.package.toString() })
+      .order("number", { ascending: true })
+      .limit(1);
 
-  const data = res.data[0];
+    data = res.data[0];
+  } catch (error) {
+    console.error("response error:", error);
+    return { notFound: true };
+  }
 
   // Pass data to the page via props
-  return {
-    props: {
-      paths: data,
-    },
-    revalidate: 60,
-  };
+  try {
+    return {
+      props: {
+        paths: data,
+      },
+      revalidate: 60,
+    };
+  } catch (error) {
+    console.error(error);
+    return { notFound: true };
+  }
 };
 
 (Lobby as PageWithLayoutType).layout = Default;

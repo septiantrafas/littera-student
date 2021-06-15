@@ -8,6 +8,7 @@ import {
   Flex,
   Box,
   Text,
+  Spinner,
 } from "@chakra-ui/react";
 import { Logo } from "@/components/Logo";
 import { TimeKeeper } from "@/components/TimeKeeper";
@@ -31,11 +32,20 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
   const { colorMode, toggleColorMode } = useColorMode();
   const { user, session } = Auth.useUser();
   const router = useRouter();
+  const { isFallback } = useRouter();
 
   const { data, error } = useSWR(
     session ? ["/api/getUser", session.access_token] : null,
     fetcher
   );
+
+  if (isFallback) {
+    return (
+      <Flex w="full" minH="100vh" justifyContent="center" alignItems="center">
+        <Spinner size="lg" />
+      </Flex>
+    );
+  }
 
   if (!user) {
     return (
@@ -77,14 +87,6 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
         <Logo ml="2" h="4" iconColor={mode("gray.900", "gray.200")} />
         <Flex alignItems="center">
           <TimeKeeper />
-          {/* <IconButton
-            aria-label={
-              colorMode === "light" ? "Toggle dark mode" : "Toggle light mode"
-            }
-            icon={colorMode === "light" ? <HiMoon /> : <HiSun />}
-            onClick={toggleColorMode}
-            ml="2"
-          /> */}
         </Flex>
       </Flex>
       {children}
