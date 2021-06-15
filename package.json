@@ -22,6 +22,8 @@
     "focus-visible": "^5.2.0",
     "formik": "^2.2.8",
     "framer-motion": "^4.1.17",
+    "lord-icon-element": "^2.0.2",
+    "lottie-web": "^5.7.11",
     "mobx": "^6.1.8",
     "mobx-persist-store": "^0.5.30",
     "mobx-react": "^7.1.0",
