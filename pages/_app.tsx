@@ -40,10 +40,6 @@ class MyApp extends App<AppLayoutProps> {
           <Auth.UserContextProvider supabaseClient={supabase}>
             <RootStoreProvider hydrationData={pageProps.hydrationData}>
               <CypressStoreProvider />
-              <Head>
-                {/* Import CSS for nprogress */}
-                <link rel="stylesheet" type="text/css" href="/nprogress.css" />
-              </Head>
               {!Component.layout ? (
                 <Component {...pageProps} />
               ) : (

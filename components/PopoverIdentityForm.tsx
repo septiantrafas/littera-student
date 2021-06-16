@@ -98,8 +98,9 @@ const PopoverIdentityForm: React.FC<IPopoverFormProps> = (props) => {
                                   <InputLeftElement
                                     color="gray.300"
                                     pointerEvents="none"
-                                    children={<HiIdentification />}
-                                  />
+                                  >
+                                    <HiIdentification />
+                                  </InputLeftElement>
                                   <Input {...field} id="nik" type="number" />
                                 </InputGroup>
                                 <FormErrorMessage>

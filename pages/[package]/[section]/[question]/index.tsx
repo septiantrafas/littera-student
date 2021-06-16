@@ -74,7 +74,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
         },
       });
     }
-  }, [time.END_TIME]);
+  }, [time.END_TIME, router]);
 
   useEffect(() => {
     const imageNodeName =
@@ -94,7 +94,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
 
     const id = store.paths[position].params.question.id;
     store.addToVisitedIndex(id);
-  }, [store.paths, props.id]);
+  }, [props.id, store]);
 
   if (isFallback) {
     return (

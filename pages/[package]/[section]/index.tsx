@@ -68,7 +68,7 @@ const ExamCategoryPage = (props: ISectionProps) => {
         },
       });
     }
-  }, [isFallback]);
+  }, [isFallback, navigation]);
 
   if (isFallback) {
     return (

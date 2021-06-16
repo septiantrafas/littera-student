@@ -59,7 +59,7 @@ export const TimeKeeper = observer(() => {
     return () => {
       clearTimeout();
     };
-  }, [timeStore.TIME]);
+  }, [isReminded, navigationStore, router, timeStore, toast]);
 
   // push to lobby if exam is not started
   useEffect(() => {
@@ -76,7 +76,7 @@ export const TimeKeeper = observer(() => {
         },
       });
     }
-  }, []);
+  }, [router, timeStore]);
 
   return (
     <>

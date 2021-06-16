@@ -98,7 +98,7 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
         clearInterval(intervalTimer);
       };
     }
-  }, [redirectPath, progress]);
+  }, [redirectPath, progress, isDevelopment, paths, router]);
 
   return (
     <>
