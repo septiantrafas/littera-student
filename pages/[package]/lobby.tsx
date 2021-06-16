@@ -1,23 +1,18 @@
-import Head from "next/head";
-
 import React, { useEffect, useState } from "react";
 import PageWithLayoutType from "@/types/pageWithLayout";
 
 import Default from "@/layouts/default";
-import {
-  Box,
-  Flex,
-  Progress,
-  Spinner,
-  systemProps,
-  Text,
-} from "@chakra-ui/react";
-import { HiOutlineExclamation } from "react-icons/hi";
-import { GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
+import { Box, CircularProgress, Flex, Text } from "@chakra-ui/react";
+import { GetStaticPaths, GetStaticProps } from "next";
 import { supabase } from "utils/initSupabase";
 import { useRouter } from "next/router";
 import { UrlObject } from "url";
 import { useNavigationStore } from "providers/RootStoreProvider";
+import dynamic from "next/dynamic";
+
+const LordIcon = dynamic(() => import("@/components/LordIcon"), {
+  ssr: false,
+});
 
 type ILobbyProps = {
   paths: {
@@ -57,77 +52,104 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
   });
 
   const [progress, setProgress] = useState(10);
-  const [status, setStatus] = useState("Establishing connection...");
+  const [status, setStatus] = useState("Mencoba koneksi...");
+  const [icon, setIcon] = useState("/icons/globe.json");
 
   useEffect(() => {
     if (isDevelopment && paths) {
-      setTimeout(() => {
-        setStatus("Checking your internet speed...");
-        setProgress(20);
-      }, 5000);
+      let intervalTimer = setInterval(() => {
+        setProgress(progress + 1);
+        console.log(progress);
+      }, 1000);
 
-      setTimeout(() => {
-        setStatus("Checking your hardware...");
-        setProgress(40);
-      }, 10000);
+      switch (progress) {
+        case 10:
+          setIcon("/icons/globe.json");
+          setStatus("memastikan kestabilan internet...");
+          break;
+        case 20:
+          setIcon("/icons/lcd-display.json");
+          setStatus("mengecek akses perangkat...");
+          break;
+        case 30:
+          setIcon("/icons/fingerprint.json");
+          setStatus("memverifikasi identitas...");
+          break;
+        case 40:
+          setIcon("/icons/eye.json");
+          setStatus("mempersiapkan lingkungan tes...");
+          break;
+        case 50:
+          setIcon("/icons/conference.json");
+          setStatus("mengakses ruangan tes...");
+          break;
+        case 100:
+          setIcon("/icons/clock.json");
+          setStatus("menunggu jadwal tes dimulai...");
+          // console.log("redirectPath:", redirectPath);
+          router.push(redirectPath);
+      }
 
-      setTimeout(() => {
-        setStatus("Verifying your identity...");
-        setProgress(60);
-      }, 15000);
+      if (progress === 100) {
+        clearInterval(intervalTimer);
+      }
 
-      setTimeout(() => {
-        setStatus("Preparing test environment...");
-        // TODO: Set browser to full-screen
-        setProgress(80);
-      }, 20000);
-
-      setTimeout(() => {
-        setStatus("Waiting for test to start");
-        setProgress(100);
-      }, 25000);
-
-      setTimeout(() => {
-        console.log("redirectPath:", redirectPath);
-        router.push(redirectPath);
-      }, 35000);
+      return () => {
+        clearInterval(intervalTimer);
+      };
     }
-  }, [redirectPath]);
+  }, [redirectPath, progress, isDevelopment, paths, router]);
 
   return (
     <>
-      <Box maxW="100%" textAlign="center" overflow="hidden" m="10" p="10">
+      <Flex
+        direction="column"
+        maxW="100%"
+        minH="90vh"
+        justifyContent="center"
+        alignItems="center"
+        overflow="hidden"
+        m="10"
+        p="10"
+      >
         <Flex justifyContent="center" color="red.500">
-          <HiOutlineExclamation size="200" />
+          <LordIcon url={icon} />
         </Flex>
-        <Box mx="auto" maxW="3xl">
+        <Flex
+          direction="column"
+          textAlign="left"
+          mx="auto"
+          maxW="3xl"
+          alignItems="center"
+        >
           <Text
-            color="red.500"
+            color="blueGray.700"
             fontSize="4xl"
-            fontWeight="semibold"
             lineHeight="10"
+            fontWeight="bold"
           >
-            Changing window or tab during an exam may result in disqualification
-            by our system!
+            Harap tunggu
           </Text>
-          <Text color="red.500" mt="4">
-            We work hard to make sure the integrity of your results really
-            indicates your level of ability.
+          <Text
+            color="blueGray.600"
+            fontSize="2xl"
+            lineHeight="10"
+            className="pulse"
+          >
+            {status}
           </Text>
-          <Box mt="20">
-            <Text fontSize="xl">{status}</Text>
-            <Progress
-              w="80%"
-              mt="5"
-              colorScheme="twitter"
-              mx="auto"
-              hasStripe
-              value={progress}
-              isAnimated
-            />
+          <Box bgColor="red.50" p="4" mt="6" rounded="xl">
+            <Text maxW="lg" color="red.500">
+              <Text as="span" color="red.600" fontWeight="bold">
+                PERHATIAN:
+              </Text>{" "}
+              Halaman ini akan beralih dengan sendirinya. Saat layar berubah ke
+              mode fullscreen, mengganti tab atau window dapat menyebabkan
+              diskualifikasi
+            </Text>
           </Box>
-        </Box>
-      </Box>
+        </Flex>
+      </Flex>
     </>
   );
 };
@@ -140,26 +162,40 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
+  // TODO: Implement static type for supabase response
+  let data = null;
+
   const query = `
   id,
   package:package_id (id)
   `;
 
-  const res = await supabase
-    .from<any>("sections")
-    .select(query)
-    .match({ package_id: params.package.toString() })
-    .order("number", { ascending: true })
-    .limit(1);
+  try {
+    const res = await supabase
+      .from<any>("sections") // TODO: Implement static type for supabase response
+      .select(query)
+      .match({ package_id: params.package.toString() })
+      .order("number", { ascending: true })
+      .limit(1);
 
-  const data = res.data[0];
-  console.log(data);
+    data = res.data[0];
+  } catch (error) {
+    console.error("response error:", error);
+    return { notFound: true };
+  }
+
   // Pass data to the page via props
-  return {
-    props: {
-      paths: data,
-    },
-  };
+  try {
+    return {
+      props: {
+        paths: data,
+      },
+      revalidate: 60,
+    };
+  } catch (error) {
+    console.error(error);
+    return { notFound: true };
+  }
 };
 
 (Lobby as PageWithLayoutType).layout = Default;

@@ -22,13 +22,3 @@ div.sbui-space-col.sbui-space-y-2 > a.sbui-typography-link:last-child {
   box-shadow: 0 0 0 2px rgb(37 99 235 / 10%) !important;
   border-color: rgba(96, 165, 250, 1) !important;
 }
-
-.options-with-image > p > img {
-  width: 100px;
-  height: 100px;
-}
-
-.options-with-image-container {
-  display: grid !important;
-  grid-auto-flow: column !important;
-}

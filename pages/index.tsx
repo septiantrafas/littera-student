@@ -8,28 +8,18 @@ import {
   Heading,
   chakra,
   Text,
-  Link,
   Box,
   Button,
   Skeleton,
-  Img,
   Input,
   useToast,
 } from "@chakra-ui/react";
-import { GetServerSideProps, GetStaticProps } from "next";
 import { supabase } from "utils/initSupabase";
 import useSWR from "swr";
 import { Auth } from "@supabase/ui";
-import {
-  HiArrowRight,
-  HiHome,
-  HiLogout,
-  HiOutlineLogout,
-  HiPhone,
-} from "react-icons/hi";
+import { HiArrowRight, HiLogout } from "react-icons/hi";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
-import { stat } from "fs/promises";
 import { RequirementCheck } from "@/components/RequirementCheck";
 
 type PackageRouteResponse = {
