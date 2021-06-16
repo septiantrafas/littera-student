@@ -29,7 +29,7 @@ const fetcher = (url, token) =>
   }).then((res) => res.json());
 
 const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
-  const { colorMode, toggleColorMode } = useColorMode();
+  // const { colorMode, toggleColorMode } = useColorMode();
   const { user, session } = Auth.useUser();
   const router = useRouter();
   const { isFallback } = useRouter();
@@ -73,9 +73,9 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
   }
 
   return (
-    <Box height="100vh" bg={mode("white", "trueGray.900")}>
+    <Box height="100vh" bg="white">
       <Flex
-        bg={mode("white", "trueGray.800")}
+        bg="white"
         boxShadow="sm"
         position="relative"
         justifyContent="space-between"
@@ -84,7 +84,7 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
         p="2"
         borderBottomWidth="1px"
       >
-        <Logo ml="2" h="4" iconColor={mode("gray.900", "gray.200")} />
+        <Logo ml="2" h="4" iconColor="gray.900" />
         <Flex alignItems="center">
           <TimeKeeper />
         </Flex>
