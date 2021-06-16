@@ -106,7 +106,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
 
   // TODO: REFACTOR THIS TO COMPONENT BASED
   return (
-    <Flex height="95vh" bg={mode("white", "trueGray.800")}>
+    <Flex height="95vh" bg={mode("white", "gray.800")}>
       <QuestionNavigator id={props.id} />
       <Box
         w={isOptionsUseImage ? "0%" : "50%"}
@@ -124,6 +124,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
         px="10"
         py="12"
         justifyContent="space-between"
+        overflowY="scroll"
       >
         <Box
           maxW={isOptionsUseImage ? "full" : { xl: "2xl", "2xl": "3xl" }}
