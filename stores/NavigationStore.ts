@@ -30,6 +30,7 @@ export type PathsHydration = {
   current_path?: Paths;
   next_path?: Paths;
   visited_index?: [];
+  current_instruction?: string;
 };
 
 export class NavigationStore {
@@ -40,6 +41,7 @@ export class NavigationStore {
   PREVIOUS_PATH: Paths;
   CURRENT_PATH: Paths;
   NEXT_PATH: Paths;
+  CURRENT_INSTRUCTION: string;
 
   constructor(root: RootStore) {
     this.root = root;
@@ -63,6 +65,8 @@ export class NavigationStore {
     this.PREVIOUS_PATH = data.previous_path != null ? data.previous_path : null;
     this.CURRENT_PATH = data.current_path != null ? data.current_path : null;
     this.NEXT_PATH = data.next_path != null ? data.next_path : null;
+    this.CURRENT_INSTRUCTION =
+      data.current_instruction != null ? data.current_instruction : null;
   }
 
   get paths() {
@@ -130,5 +134,13 @@ export class NavigationStore {
       );
       return this.ANSWERED_INDEX[location].option_id;
     }
+  }
+
+  getCurrentInstruction(): string {
+    return this.CURRENT_INSTRUCTION;
+  }
+
+  setCurrentInstruction(instruction: string) {
+    this.CURRENT_INSTRUCTION = instruction;
   }
 }

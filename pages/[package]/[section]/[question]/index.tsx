@@ -32,6 +32,7 @@ type IQuestionsPath = {
     id: string;
     start_time: string;
     end_time: string;
+    context: string;
     packages: { id: number };
   };
 };
@@ -307,6 +308,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         id,
         start_time,
         end_time,
+        context,
         packages:package_id ( id ) 
     )
   `;
@@ -317,16 +319,21 @@ export const getStaticProps: GetStaticProps = async (context) => {
     .match({ section_id: context.params.section.toString() })
     .order("number", { ascending: true });
 
-  const paths = path_res.data.map((question) => ({
-    params: {
-      package: question.sections.packages.id.toString(),
-      section: question.sections.id.toString(),
-      question: {
-        id: question.id.toString(),
-        number: question.number,
+  let instruction = "";
+  const paths = path_res.data.map((question) => {
+    instruction = question.sections.context;
+
+    return {
+      params: {
+        package: question.sections.packages.id.toString(),
+        section: question.sections.id.toString(),
+        question: {
+          id: question.id.toString(),
+          number: question.number,
+        },
       },
-    },
-  }));
+    };
+  });
 
   const position = paths.findIndex(
     (arr) => arr.params.question.id === context.params.question.toString()
@@ -358,6 +365,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
       previous_path,
       current_path,
       next_path,
+      current_instruction: instruction,
     },
   };
 
