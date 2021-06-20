@@ -171,8 +171,8 @@ const AnsweredButton = observer((props: GridButtonProps) => {
         borderColor={mode("emerald.400", "emerald.700")}
         bgColor={mode("emerald.50", "emerald.900")}
         color={mode("emerald.600", "emerald.100")}
-        _hover={{ bgColor: mode("emerald.100", "green.700") }}
-        _active={{ bgColor: mode("emerald.50", "green.700") }}
+        _hover={{ bgColor: mode("emerald.100", "emerald.700") }}
+        _active={{ bgColor: mode("emerald.50", "emerald.700") }}
         variant="outline"
       >
         {props.path.params.question.number}

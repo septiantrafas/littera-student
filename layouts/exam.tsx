@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   useColorMode,
@@ -9,13 +9,21 @@ import {
   Box,
   Text,
   Spinner,
+  useDisclosure,
+  Drawer,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerHeader,
+  DrawerBody,
 } from "@chakra-ui/react";
 import { Logo } from "@/components/Logo";
 import { TimeKeeper } from "@/components/TimeKeeper";
-import { HiMoon, HiSun } from "react-icons/hi";
+import { HiMoon, HiOutlineQuestionMarkCircle, HiSun } from "react-icons/hi";
 import { Auth } from "@supabase/ui";
 import useSWR from "swr";
 import { useRouter } from "next/router";
+import { useNavigationStore } from "providers/RootStoreProvider";
+import screenfull from "screenfull";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -29,7 +37,11 @@ const fetcher = (url, token) =>
   }).then((res) => res.json());
 
 const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
-  const { colorMode, toggleColorMode } = useColorMode();
+  // const { colorMode, toggleColorMode } = useColorMode();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const navigation = useNavigationStore();
+  const [isFullScreen, setFullScreen] = useState(false);
+
   const { user, session } = Auth.useUser();
   const router = useRouter();
   const { isFallback } = useRouter();
@@ -38,6 +50,20 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
     session ? ["/api/getUser", session.access_token] : null,
     fetcher
   );
+
+  useEffect(() => {
+    if (screenfull.isEnabled) {
+      screenfull.on("change", () => {
+        setFullScreen(screenfull.isEnabled ? screenfull.isFullscreen : false);
+      });
+    }
+  });
+
+  useEffect(() => {
+    if (screenfull.isEnabled) {
+      setFullScreen(screenfull.isFullscreen);
+    }
+  }, []);
 
   if (isFallback) {
     return (
@@ -73,9 +99,9 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
   }
 
   return (
-    <Box height="100vh" bg={mode("white", "trueGray.900")}>
+    <Box height="100vh" bg="white">
       <Flex
-        bg={mode("white", "trueGray.800")}
+        bg="white"
         boxShadow="sm"
         position="relative"
         justifyContent="space-between"
@@ -84,12 +110,60 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
         p="2"
         borderBottomWidth="1px"
       >
-        <Logo ml="2" h="4" iconColor={mode("gray.900", "gray.200")} />
+        <Logo ml="2" h="4" iconColor="gray.900" />
         <Flex alignItems="center">
           <TimeKeeper />
+          {navigation.getCurrentInstruction() ? (
+            <>
+              <Button
+                size="sm"
+                colorScheme="blue"
+                onClick={onOpen}
+                leftIcon={<HiOutlineQuestionMarkCircle />}
+                variant="outline"
+              >
+                Instruksi
+              </Button>
+              <Drawer placement="bottom" onClose={onClose} isOpen={isOpen}>
+                <DrawerOverlay />
+                <DrawerContent>
+                  <DrawerHeader borderBottomWidth="1px">
+                    Instruksi dan Contoh Soal
+                  </DrawerHeader>
+                  <DrawerBody>
+                    <Text my="4">{navigation.getCurrentInstruction()}</Text>
+                  </DrawerBody>
+                </DrawerContent>
+              </Drawer>
+            </>
+          ) : null}
         </Flex>
       </Flex>
-      {children}
+      {isFullScreen ? (
+        children
+      ) : (
+        <Flex
+          direction="column"
+          minH="90vh"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Text>
+            Anda harus dalam mode Fullscreen untuk dapat mengakses soal
+          </Text>
+          <Button
+            mt="4"
+            onClick={() => {
+              if (screenfull.isEnabled) {
+                setFullScreen(true);
+                screenfull.request();
+              }
+            }}
+          >
+            Masuk ke mode Fullscreen
+          </Button>
+        </Flex>
+      )}
     </Box>
   );
 };

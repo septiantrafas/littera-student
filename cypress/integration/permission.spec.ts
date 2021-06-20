@@ -39,7 +39,7 @@ describe("Permission page", () => {
       });
 
       describe("Verify media permission", () => {
-        it("Should turn camera status to green", () => {
+        it("Should turn camera status to emerald", () => {
           cy.get("[data-cy=camera-status]").should(
             "have.css",
             "background-color",
@@ -47,7 +47,7 @@ describe("Permission page", () => {
           );
         });
 
-        it("Should turn mic status to green", () => {
+        it("Should turn mic status to emerald", () => {
           cy.get("[data-cy=microphone-status]").should(
             "have.css",
             "background-color",

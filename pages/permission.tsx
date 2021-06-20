@@ -76,7 +76,7 @@ const Permission: React.FC = () => {
                     rounded="full"
                     position="absolute"
                     display="inline-flex"
-                    bg={isMediaPermissionGranted ? "green.400" : "orange.400"}
+                    bg={isMediaPermissionGranted ? "emerald.400" : "amber.400"}
                     style={{
                       animation:
                         "ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite",
@@ -89,7 +89,7 @@ const Permission: React.FC = () => {
                     h="full"
                     w="full"
                     rounded="full"
-                    bg={isMediaPermissionGranted ? "green.500" : "tomato"}
+                    bg={isMediaPermissionGranted ? "emerald.500" : "tomato"}
                   />
                 </AvatarBadge>
               </Avatar>
@@ -110,7 +110,7 @@ const Permission: React.FC = () => {
                     rounded="full"
                     position="absolute"
                     display="inline-flex"
-                    bg={isMediaPermissionGranted ? "green.400" : "orange.400"}
+                    bg={isMediaPermissionGranted ? "emerald.400" : "amber.400"}
                     style={{
                       animation:
                         "ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite",
@@ -123,7 +123,7 @@ const Permission: React.FC = () => {
                     h="full"
                     w="full"
                     rounded="full"
-                    bg={isMediaPermissionGranted ? "green.500" : "tomato"}
+                    bg={isMediaPermissionGranted ? "emerald.500" : "tomato"}
                   />
                 </AvatarBadge>
               </Avatar>

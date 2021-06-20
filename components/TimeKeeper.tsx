@@ -20,7 +20,7 @@ export const TimeKeeper = observer(() => {
   const toast_id = "time-reminder";
 
   useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       const timeLeft = timeStore.calculateTimeLeft(timeStore.TIME);
 
       // console.log("timeleft: ", timeLeft.unix());
@@ -57,9 +57,11 @@ export const TimeKeeper = observer(() => {
       }
     }, 1000);
     return () => {
-      clearTimeout();
+      if (timer) {
+        clearTimeout(timer);
+      }
     };
-  }, [isReminded, navigationStore, router, timeStore, toast]);
+  }, [isReminded, navigationStore, router, timeStore, timeStore.TIME, toast]);
 
   // push to lobby if exam is not started
   useEffect(() => {

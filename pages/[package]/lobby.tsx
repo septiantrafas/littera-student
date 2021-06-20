@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import PageWithLayoutType from "@/types/pageWithLayout";
 
 import Default from "@/layouts/default";
-import { Box, CircularProgress, Flex, Text } from "@chakra-ui/react";
+import { Box, Button, CircularProgress, Flex, Text } from "@chakra-ui/react";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { supabase } from "utils/initSupabase";
 import { useRouter } from "next/router";
 import { UrlObject } from "url";
 import { useNavigationStore } from "providers/RootStoreProvider";
 import dynamic from "next/dynamic";
+import screenfull from "screenfull";
+import { HiOutlineRefresh } from "react-icons/hi";
 
 const LordIcon = dynamic(() => import("@/components/LordIcon"), {
   ssr: false,
@@ -52,12 +54,13 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
   });
 
   const [progress, setProgress] = useState(10);
-  const [status, setStatus] = useState("Mencoba koneksi...");
-  const [icon, setIcon] = useState("/icons/globe.json");
+  const [status, setStatus] = useState("Menunggu akses diberikan...");
+  const [icon, setIcon] = useState("/icons/error.json");
+  const [isFullScreen, setFullScreen] = useState(false);
 
   useEffect(() => {
-    if (isDevelopment && paths) {
-      let intervalTimer = setInterval(() => {
+    if (isDevelopment && paths && isFullScreen) {
+      let timer = setInterval(() => {
         setProgress(progress + 1);
         console.log(progress);
       }, 1000);
@@ -91,30 +94,62 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
       }
 
       if (progress === 100) {
-        clearInterval(intervalTimer);
+        clearInterval(timer);
       }
 
       return () => {
-        clearInterval(intervalTimer);
+        if (timer) {
+          clearInterval(timer);
+        }
       };
+    } else if (isDevelopment && paths && !isFullScreen) {
+      setIcon("/icons/error.json");
+      setStatus("Menunggu akses diberikan...");
     }
-  }, [redirectPath, progress, isDevelopment, paths, router]);
+  }, [redirectPath, progress, isDevelopment, paths, router, isFullScreen]);
+
+  useEffect(() => {
+    if (screenfull.isEnabled) {
+      screenfull.on("change", () => {
+        setFullScreen(screenfull.isEnabled ? screenfull.isFullscreen : false);
+      });
+    }
+  });
 
   return (
     <>
       <Flex
+        pos="relative"
         direction="column"
         maxW="100%"
         minH="90vh"
         justifyContent="center"
         alignItems="center"
         overflow="hidden"
-        m="10"
-        p="10"
       >
-        <Flex justifyContent="center" color="red.500">
+        {!isFullScreen && (
+          <Box
+            pos="absolute"
+            top="0"
+            bgColor="red.50"
+            p="4"
+            mt="6"
+            rounded="xl"
+          >
+            <Text maxW="lg" color="red.500">
+              <Text as="span" color="red.600" fontWeight="bold">
+                PERHATIAN:
+              </Text>{" "}
+              Tes ini membutuhkan akses layar untuk memulai, sistem tidak akan
+              berjalan apabila akses layar belum diberikan.
+            </Text>
+          </Box>
+        )}
+
+        <Flex justifyContent="center" opacity="50%">
           <LordIcon url={icon} />
         </Flex>
+
         <Flex
           direction="column"
           textAlign="left"
@@ -128,7 +163,7 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
             lineHeight="10"
             fontWeight="bold"
           >
-            Harap tunggu
+            {!isFullScreen ? "Meminta akses layar" : "Harap Tunggu"}
           </Text>
           <Text
             color="blueGray.600"
@@ -138,16 +173,34 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
           >
             {status}
           </Text>
-          <Box bgColor="red.50" p="4" mt="6" rounded="xl">
-            <Text maxW="lg" color="red.500">
-              <Text as="span" color="red.600" fontWeight="bold">
-                PERHATIAN:
-              </Text>{" "}
-              Halaman ini akan beralih dengan sendirinya. Saat layar berubah ke
-              mode fullscreen, mengganti tab atau window dapat menyebabkan
-              diskualifikasi
-            </Text>
-          </Box>
+
+          {isFullScreen ? null : (
+            <Button
+              onClick={() => {
+                setFullScreen(true);
+                if (screenfull.isEnabled) {
+                  screenfull.request();
+                }
+              }}
+              colorScheme="blue"
+              mt="6"
+              rightIcon={<HiOutlineRefresh />}
+            >
+              Berikan izin pada layar
+            </Button>
+          )}
+
+          {isFullScreen && (
+            <Box bgColor="blue.50" p="4" mt="6" rounded="xl">
+              <Text maxW="lg" color="blue.600">
+                <Text as="span" color="blue.700" fontWeight="bold">
+                  Info:
+                </Text>{" "}
+                Halaman ini akan beralih dengan sendirinya. Jangan lupa
+                mengerjakan tes sesuai dengan peraturan.
+              </Text>
+            </Box>
+          )}
         </Flex>
       </Flex>
     </>

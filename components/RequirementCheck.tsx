@@ -148,7 +148,7 @@ const DynamicListIcon: React.FC<IDynamicListIconProps> = (props) => {
         <Text
           fontSize="lg"
           fontWeight="medium"
-          color={props.condition ? "green.900" : "red.900"}
+          color={props.condition ? "emerald.900" : "red.900"}
         >
           {/* Verifikasi Identitas */}
           {props.header}
