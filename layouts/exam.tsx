@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   useColorMode,
@@ -23,6 +23,7 @@ import { Auth } from "@supabase/ui";
 import useSWR from "swr";
 import { useRouter } from "next/router";
 import { useNavigationStore } from "providers/RootStoreProvider";
+import screenfull from "screenfull";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -39,6 +40,7 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
   // const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigation = useNavigationStore();
+  const [isFullScreen, setFullScreen] = useState(false);
 
   const { user, session } = Auth.useUser();
   const router = useRouter();
@@ -48,6 +50,20 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
     session ? ["/api/getUser", session.access_token] : null,
     fetcher
   );
+
+  useEffect(() => {
+    if (screenfull.isEnabled) {
+      screenfull.on("change", () => {
+        setFullScreen(screenfull.isEnabled ? screenfull.isFullscreen : false);
+      });
+    }
+  });
+
+  useEffect(() => {
+    if (screenfull.isEnabled) {
+      setFullScreen(screenfull.isFullscreen);
+    }
+  }, []);
 
   if (isFallback) {
     return (
@@ -123,7 +139,31 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
           ) : null}
         </Flex>
       </Flex>
-      {children}
+      {isFullScreen ? (
+        children
+      ) : (
+        <Flex
+          direction="column"
+          minH="90vh"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Text>
+            Anda harus dalam mode Fullscreen untuk dapat mengakses soal
+          </Text>
+          <Button
+            mt="4"
+            onClick={() => {
+              if (screenfull.isEnabled) {
+                setFullScreen(true);
+                screenfull.request();
+              }
+            }}
+          >
+            Masuk ke mode Fullscreen
+          </Button>
+        </Flex>
+      )}
     </Box>
   );
 };
