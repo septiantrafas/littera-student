@@ -109,8 +109,8 @@ const ExamQuestionPage = (props: IQuestionProps) => {
   return (
     <Flex height="95vh" bg={mode("white", "gray.800")}>
       <QuestionNavigator id={props.id} />
-      <Box
-        w={isOptionsUseImage ? "0%" : "50%"}
+      {!isOptionsUseImage && <Box
+        w="50%"
         px="10"
         py="12"
         overflow="scroll"
@@ -119,7 +119,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
           {!props.text && ReactHtmlParser(props.question)}
           {ReactHtmlParser(props.text)}
         </Text>
-      </Box>
+      </Box>}
       <Box
         w={isOptionsUseImage ? "100%" : "50%"}
         px="10"
@@ -139,7 +139,8 @@ const ExamQuestionPage = (props: IQuestionProps) => {
             className="options-with-image"
           >
             {props.text && ReactHtmlParser(props.question)}
-            {!props.text && ``}
+            {isOptionsUseImage && ReactHtmlParser(props.question)}
+            {!props.text && null}
           </Text>
           <RadioGroup
             onChange={(nextValue) =>
