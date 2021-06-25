@@ -35,9 +35,10 @@ export type PathsHydration = {
 
 export class NavigationStore {
   root: RootStore;
+  SCHEDULE_ID?: number;
   PATHS: Paths[];
   VISITED_INDEX: string[] = [];
-  ANSWERED_INDEX: AnsweredIndex[] = [];
+  ANSWERED_INDEX?: AnsweredIndex[] = [];
   PREVIOUS_PATH: Paths;
   CURRENT_PATH: Paths;
   NEXT_PATH: Paths;
@@ -46,7 +47,7 @@ export class NavigationStore {
   constructor(root: RootStore) {
     this.root = root;
     makeAutoObservable(this);
-    persistStore(this, ["ANSWERED_INDEX", "CURRENT_PATH"], "NavigationStore");
+    persistStore(this, ["ANSWERED_INDEX", "CURRENT_PATH", "SCHEDULE_ID"], "NavigationStore");
   }
 
   clearStore = () => {
@@ -91,6 +92,14 @@ export class NavigationStore {
 
   set previous_path(value) {
     this.PREVIOUS_PATH = value;
+  }
+  
+  get schedule_id() {
+    return this.SCHEDULE_ID;
+  }
+
+  set schedule_id(value) {
+    this.SCHEDULE_ID = value;
   }
 
   isVisited(index: string) {

@@ -21,20 +21,18 @@ import { HiArrowRight, HiLogout } from "react-icons/hi";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 import { RequirementCheck } from "@/components/RequirementCheck";
+import { useNavigationStore } from "providers/RootStoreProvider";
 
-type PackageRouteResponse = {
+interface IScheduleResponse {
   id: string;
-  start_time: string;
-  package: {
+  schedule: {
     id: string;
     name: string;
-    organization: {
-      name: string;
-      address: string;
-      phone: string;
-    };
-  };
-};
+    exam_date: string;
+    url: string;
+    package_id: string;
+  }
+}
 
 const fetcher = (url, token) =>
   fetch(url, {
@@ -46,11 +44,12 @@ const fetcher = (url, token) =>
 const Home: React.FC = () => {
   const router = useRouter();
   const toast = useToast();
+  const navigation = useNavigationStore()
   const { user, session } = Auth.useUser();
 
   const [email, setEmail] = useState("");
   const [isLoading, setLoading] = useState(false);
-  const [schedules, setSchedules] = useState([]);
+  const [schedules, setSchedules] = useState<IScheduleResponse[]>(null);
 
   const { data, error } = useSWR(
     session ? ["/api/getUser", session.access_token] : null,
@@ -96,14 +95,16 @@ const Home: React.FC = () => {
         const query = `
         id,
         schedule:schedule_id (
+          id,
           name,
           exam_date,
           url,
           package_id
         )
         `;
+        
         const res = await supabase
-          .from<any>("participants")
+          .from<IScheduleResponse>("participants")
           .select(query)
           .match({ profile_id: user.id });
 
@@ -113,7 +114,7 @@ const Home: React.FC = () => {
       }
     };
     handleAsync();
-  }, [user]);
+  }, [navigation, user]);
 
   if (!user) {
     return (
@@ -188,7 +189,7 @@ const Home: React.FC = () => {
               </Skeleton>
             </Box>
 
-            {!schedules.length && (
+            {!schedules?.length && (
               <Box py="20" px="4" bg="gray.100" borderRadius="lg">
                 <Text color="gray.400" textAlign="center">
                   No Invite
@@ -211,19 +212,18 @@ const Home: React.FC = () => {
                     {dayjs(schedule.exam_date).format("DD MMM YYYY - HH:mm")}
                   </Text>
                   <Flex mt="4">
-                    <NextLink
-                      href={`/${encodeURIComponent(schedule.package_id)}/lobby`}
-                      passHref
+                    <Button
+                      mt="4"
+                      size="sm"
+                      rightIcon={<HiArrowRight />}
+                      colorScheme="blue"
+                      onClick={() => {
+                        navigation.schedule_id = parseInt(schedule.id)
+                        router.push(`/${encodeURIComponent(schedule.package_id)}/lobby`)
+                      }}
                     >
-                      <Button
-                        mt="4"
-                        size="sm"
-                        rightIcon={<HiArrowRight />}
-                        colorScheme="blue"
-                      >
-                        Ikuti Asesmen
-                      </Button>
-                    </NextLink>
+                      Ikuti Asesmen
+                    </Button>
                   </Flex>
                 </Box>
               ))}
