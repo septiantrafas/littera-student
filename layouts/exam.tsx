@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import {
-  useColorMode,
   useColorModeValue as mode,
-  IconButton,
   Button,
   Flex,
   Box,
@@ -18,9 +16,8 @@ import {
 } from "@chakra-ui/react";
 import { Logo } from "@/components/Logo";
 import { TimeKeeper } from "@/components/TimeKeeper";
-import { HiMoon, HiOutlineQuestionMarkCircle, HiSun } from "react-icons/hi";
+import { HiOutlineQuestionMarkCircle } from "react-icons/hi";
 import { Auth } from "@supabase/ui";
-import useSWR from "swr";
 import { useRouter } from "next/router";
 import { useNavigationStore } from "providers/RootStoreProvider";
 import screenfull from "screenfull";
@@ -28,13 +25,6 @@ import screenfull from "screenfull";
 type LayoutProps = {
   children: React.ReactNode;
 };
-
-const fetcher = (url, token) =>
-  fetch(url, {
-    method: "GET",
-    headers: new Headers({ "Content-Type": "application/json", token }),
-    credentials: "same-origin",
-  }).then((res) => res.json());
 
 const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
   // const { colorMode, toggleColorMode } = useColorMode();
@@ -45,11 +35,6 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
   const { user, session } = Auth.useUser();
   const router = useRouter();
   const { isFallback } = useRouter();
-
-  const { data, error } = useSWR(
-    session ? ["/api/getUser", session.access_token] : null,
-    fetcher
-  );
 
   useEffect(() => {
     if (screenfull.isEnabled) {

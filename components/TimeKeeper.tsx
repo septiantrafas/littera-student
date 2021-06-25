@@ -45,7 +45,7 @@ export const TimeKeeper = observer(() => {
         }
       } else {
         document.getElementById("time").innerHTML = "00:00:00";
-        navigationStore.clearStore();
+
         setIsReminded(false);
         router.push({
           pathname: "/[package]/[section]",

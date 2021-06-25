@@ -11,8 +11,16 @@ import { useNavigationStore, useTimeStore } from "providers/RootStoreProvider";
 import { supabase } from "utils/initSupabase";
 import timezone from "dayjs/plugin/timezone";
 import NextLink from "next/link";
+import { Auth } from "@supabase/ui";
 
 dayjs.extend(timezone);
+
+interface IAnswerBody {
+  schedule_id: number,
+  profile_id: string,
+  question_id: string,
+  value: string,
+}
 
 type ISectionResponse = {
   id: string;
@@ -50,12 +58,39 @@ const ExamCategoryPage = (props: ISectionProps) => {
   const store = useTimeStore();
   const { route, isFallback } = useRouter();
   const navigation = useNavigationStore();
+  const { user, session } = Auth.useUser();
 
   const [redirectPath, setRedirectPath] = useState({});
 
   const start_time = dayjs(props.start_time);
   const end_time = dayjs(props.end_time);
   const duration = end_time.diff(start_time, "minutes");
+
+  useEffect(() => {
+    //TODO: CREATE A SUBMIT FEEDBACK SO USER KNOW WHAT'S GOING ON
+    if (navigation.ANSWERED_INDEX.length) {
+      const body: IAnswerBody[] = navigation.ANSWERED_INDEX.map((item) => {
+        return {
+          schedule_id: navigation.schedule_id,
+          profile_id: user.id,
+          question_id: item.question_id,
+          value: item.option_id.toString(),
+        }
+      });
+      
+      (async () => {
+        try {
+          const res = await supabase
+          .from('answers')
+          .insert(body)
+
+          navigation.clearStore()
+        } catch (error) {
+          console.log(error)
+        }
+      })()
+    }
+  }, [navigation, navigation.ANSWERED_INDEX, user])
 
   useEffect(() => {
     if (!isFallback) {
