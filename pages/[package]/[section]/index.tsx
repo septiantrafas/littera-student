@@ -16,10 +16,10 @@ import { Auth } from "@supabase/ui";
 dayjs.extend(timezone);
 
 interface IAnswerBody {
-  schedule_id: number,
-  profile_id: string,
-  question_id: string,
-  value: string,
+  schedule_id: number;
+  profile_id: string;
+  question_id: string;
+  value: string;
 }
 
 type ISectionResponse = {
@@ -67,30 +67,32 @@ const ExamCategoryPage = (props: ISectionProps) => {
   const duration = end_time.diff(start_time, "minutes");
 
   useEffect(() => {
+    const isAnySelectedAnswer = navigation.ANSWERED_INDEX.length;
+    //FIXME: CREATE NEW CONDITION TO DETERMINE IF USER JUST RECOVERED FROM DISCONNECTING. WE TOOK THIS APPROACH TO PREVENT ANY SUBMISSION BEFORE THE GIVEN TIME. TO DIFFERENTIATE, A USER THAT HAVE ANSWERED_INDEX ON THEIR LOCAL STORAGE THAT SPECIFY NOT_FIRST_ENTRY AS TRUE WOULD BE ALLOWED TO SUBMIT THE ANSWER.
+
     //TODO: CREATE A SUBMIT FEEDBACK SO USER KNOW WHAT'S GOING ON
-    if (navigation.ANSWERED_INDEX.length) {
+    if (isAnySelectedAnswer) {
+      console.log("SUBMITTING");
       const body: IAnswerBody[] = navigation.ANSWERED_INDEX.map((item) => {
         return {
           schedule_id: navigation.schedule_id,
           profile_id: user.id,
           question_id: item.question_id,
           value: item.option_id.toString(),
-        }
+        };
       });
-      
+
       (async () => {
         try {
-          const res = await supabase
-          .from('answers')
-          .insert(body)
+          const res = await supabase.from("answers").insert(body);
 
-          navigation.clearStore()
+          navigation.clearStore();
         } catch (error) {
-          console.log(error)
+          console.log(error);
         }
-      })()
+      })();
     }
-  }, [navigation, navigation.ANSWERED_INDEX, user])
+  }, [navigation, navigation.ANSWERED_INDEX, user]);
 
   useEffect(() => {
     if (!isFallback) {

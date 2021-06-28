@@ -47,7 +47,11 @@ export class NavigationStore {
   constructor(root: RootStore) {
     this.root = root;
     makeAutoObservable(this);
-    persistStore(this, ["ANSWERED_INDEX", "CURRENT_PATH", "SCHEDULE_ID"], "NavigationStore");
+    persistStore(
+      this,
+      ["ANSWERED_INDEX", "CURRENT_PATH", "SCHEDULE_ID", "VISITED_INDEX"],
+      "NavigationStore"
+    );
   }
 
   clearStore = () => {
@@ -93,7 +97,7 @@ export class NavigationStore {
   set previous_path(value) {
     this.PREVIOUS_PATH = value;
   }
-  
+
   get schedule_id() {
     return this.SCHEDULE_ID;
   }

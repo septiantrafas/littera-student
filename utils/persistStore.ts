@@ -26,7 +26,7 @@ export const persistStore = (target, properties, persistName) => {
           );
         }
 
-        // await new Promise((resolve) => setTimeout(resolve, 300)); // For hydrate simulation
+        await new Promise((resolve) => setTimeout(resolve, 300)); // For hydrate simulation
         return data ? JSON.parse(data) : undefined;
       },
       write: async (name, content) => {

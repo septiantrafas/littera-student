@@ -61,7 +61,7 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
   useEffect(() => {
     if (isDevelopment && paths && isFullScreen) {
       let timer = setInterval(() => {
-        setProgress(progress + 1);
+        setProgress(progress + 5);
         console.log(progress);
       }, 1000);
 
@@ -89,8 +89,24 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
         case 100:
           setIcon("/icons/clock.json");
           setStatus("menunggu jadwal tes dimulai...");
-          // console.log("redirectPath:", redirectPath);
-          router.push(redirectPath);
+          // TODO: Change redirect path using navigationStore.current_path
+          console.log(
+            "redirectPath:",
+            JSON.stringify(navigationStore.CURRENT_PATH)
+          );
+          if (navigationStore.CURRENT_PATH) {
+            const params = navigationStore.CURRENT_PATH.params;
+
+            router.push({
+              pathname: "/[package]/[section]",
+              query: {
+                package: params.package,
+                section: params.section,
+              },
+            });
+          } else {
+            router.push(redirectPath);
+          }
       }
 
       if (progress === 100) {
@@ -106,7 +122,15 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
       setIcon("/icons/error.json");
       setStatus("Menunggu akses diberikan...");
     }
-  }, [redirectPath, progress, isDevelopment, paths, router, isFullScreen]);
+  }, [
+    redirectPath,
+    progress,
+    isDevelopment,
+    paths,
+    router,
+    isFullScreen,
+    navigationStore.CURRENT_PATH,
+  ]);
 
   useEffect(() => {
     if (screenfull.isEnabled) {
