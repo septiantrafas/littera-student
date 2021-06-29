@@ -37,7 +37,7 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
   const { paths } = props;
 
   const router = useRouter();
-  const navigationStore = useNavigationStore();
+  const navigation = useNavigationStore();
   const isDevelopment = process.env.NEXT_PUBLIC_ENVIRONMENT === "development";
 
   // const [{ isEligible, redirectPath }, setState] = useState<LobbyState>({
@@ -89,14 +89,12 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
         case 100:
           setIcon("/icons/clock.json");
           setStatus("menunggu jadwal tes dimulai...");
-          // TODO: Change redirect path using navigationStore.current_path
-          console.log(
-            "redirectPath:",
-            JSON.stringify(navigationStore.CURRENT_PATH)
-          );
-          if (navigationStore.CURRENT_PATH) {
-            const params = navigationStore.CURRENT_PATH.params;
 
+          // TODO: Change redirect path using navigationStore.current_path
+          console.log("redirectPath:", JSON.stringify(redirectPath));
+
+          if (navigation.CURRENT_PATH) {
+            const params = navigation.CURRENT_PATH.params;
             router.push({
               pathname: "/[package]/[section]",
               query: {
@@ -117,6 +115,8 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
         if (timer) {
           clearInterval(timer);
         }
+
+        navigation.setFirstEntryState(true);
       };
     } else if (isDevelopment && paths && !isFullScreen) {
       setIcon("/icons/error.json");
@@ -129,7 +129,8 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
     paths,
     router,
     isFullScreen,
-    navigationStore.CURRENT_PATH,
+    navigation.CURRENT_PATH,
+    navigation,
   ]);
 
   useEffect(() => {

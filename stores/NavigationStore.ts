@@ -43,13 +43,20 @@ export class NavigationStore {
   CURRENT_PATH: Paths;
   NEXT_PATH: Paths;
   CURRENT_INSTRUCTION: string;
+  FIRST_ENTRY: boolean;
 
   constructor(root: RootStore) {
     this.root = root;
     makeAutoObservable(this);
     persistStore(
       this,
-      ["ANSWERED_INDEX", "CURRENT_PATH", "SCHEDULE_ID", "VISITED_INDEX"],
+      [
+        "ANSWERED_INDEX",
+        "CURRENT_PATH",
+        "SCHEDULE_ID",
+        "VISITED_INDEX",
+        "FIRST_ENTRY",
+      ],
       "NavigationStore"
     );
   }
@@ -57,6 +64,7 @@ export class NavigationStore {
   clearStore = () => {
     try {
       this.ANSWERED_INDEX = [];
+      this.VISITED_INDEX = [];
       clearPersist(this);
       return true;
     } catch (error) {
@@ -155,5 +163,9 @@ export class NavigationStore {
 
   setCurrentInstruction(instruction: string) {
     this.CURRENT_INSTRUCTION = instruction;
+  }
+
+  setFirstEntryState(state: boolean) {
+    this.FIRST_ENTRY = state;
   }
 }

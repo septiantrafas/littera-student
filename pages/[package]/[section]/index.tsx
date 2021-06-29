@@ -12,6 +12,7 @@ import { supabase } from "utils/initSupabase";
 import timezone from "dayjs/plugin/timezone";
 import NextLink from "next/link";
 import { Auth } from "@supabase/ui";
+import { log, Style } from "utils/consoleLogHelper";
 
 dayjs.extend(timezone);
 
@@ -56,7 +57,7 @@ type ISectionProps = {
 
 const ExamCategoryPage = (props: ISectionProps) => {
   const store = useTimeStore();
-  const { route, isFallback } = useRouter();
+  const router = useRouter();
   const navigation = useNavigationStore();
   const { user, session } = Auth.useUser();
 
@@ -68,11 +69,15 @@ const ExamCategoryPage = (props: ISectionProps) => {
 
   useEffect(() => {
     const isAnySelectedAnswer = navigation.ANSWERED_INDEX.length;
-    //FIXME: CREATE NEW CONDITION TO DETERMINE IF USER JUST RECOVERED FROM DISCONNECTING. WE TOOK THIS APPROACH TO PREVENT ANY SUBMISSION BEFORE THE GIVEN TIME. TO DIFFERENTIATE, A USER THAT HAVE ANSWERED_INDEX ON THEIR LOCAL STORAGE THAT SPECIFY NOT_FIRST_ENTRY AS TRUE WOULD BE ALLOWED TO SUBMIT THE ANSWER.
+    const isFirstEntry = navigation.FIRST_ENTRY;
+
+    log("isAnySelectedAnswer: " + isAnySelectedAnswer);
+    log("isFirstEntry: " + isFirstEntry);
 
     //TODO: CREATE A SUBMIT FEEDBACK SO USER KNOW WHAT'S GOING ON
-    if (isAnySelectedAnswer) {
-      console.log("SUBMITTING");
+    if (isAnySelectedAnswer && !isFirstEntry) {
+      navigation.setFirstEntryState(false);
+      log("SUBMITTING");
       const body: IAnswerBody[] = navigation.ANSWERED_INDEX.map((item) => {
         return {
           schedule_id: navigation.schedule_id,
@@ -95,7 +100,7 @@ const ExamCategoryPage = (props: ISectionProps) => {
   }, [navigation, navigation.ANSWERED_INDEX, user]);
 
   useEffect(() => {
-    if (!isFallback) {
+    if (!router.isFallback) {
       setRedirectPath({
         pathname: "/[package]/[section]/[question]",
         query: {
@@ -105,9 +110,9 @@ const ExamCategoryPage = (props: ISectionProps) => {
         },
       });
     }
-  }, [isFallback, navigation]);
+  }, [router.isFallback, navigation]);
 
-  if (isFallback) {
+  if (router.isFallback) {
     return (
       <>
         <Spinner size="lg" />
@@ -136,8 +141,8 @@ const ExamCategoryPage = (props: ISectionProps) => {
           Contoh Soal
         </Text>
         <Text>{props.context}</Text> */}
-        <NextLink href={redirectPath}>
-          <Button data-cy="start-button" mt="6">
+        <NextLink href={redirectPath} passHref>
+          <Button type="button" data-cy="start-button" mt="6">
             Start
           </Button>
         </NextLink>
