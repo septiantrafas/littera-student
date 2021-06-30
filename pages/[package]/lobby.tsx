@@ -33,6 +33,14 @@ type LobbyState = {
   redirectPath: string | UrlObject;
 };
 
+interface ISectionUrl {
+  pathname: string;
+  query?: {
+    package: string;
+    section: string;
+  };
+}
+
 const Lobby: React.FC<ILobbyProps> = (props) => {
   const { paths } = props;
 
@@ -45,7 +53,7 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
   //   redirectPath: "/verification",
   // });
 
-  const [redirectPath, setRedirectPath] = useState<string | UrlObject>({
+  const [redirectPath, setRedirectPath] = useState<ISectionUrl>({
     pathname: "/[package]/[section]",
     query: {
       package: paths.package.id,
@@ -81,6 +89,19 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
         case 40:
           setIcon("/icons/eye.json");
           setStatus("mempersiapkan lingkungan tes...");
+
+          if (navigation.CURRENT_PATH) {
+            const params = navigation.CURRENT_PATH.params;
+            router.prefetch(
+              `/${encodeURI(params.package)}/${encodeURI(params.section)}`
+            );
+          } else {
+            const query = redirectPath.query;
+            router.prefetch(
+              `/${encodeURI(query.package)}/${encodeURI(query.section)}`
+            );
+          }
+
           break;
         case 50:
           setIcon("/icons/conference.json");
