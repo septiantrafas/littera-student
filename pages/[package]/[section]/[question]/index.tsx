@@ -66,6 +66,13 @@ const ExamQuestionPage = (props: IQuestionProps) => {
   const [isOptionsUseImage, setOptionsUseImage] = useState(false);
 
   useEffect(() => {
+    const packageID = router.query.package.toString();
+    const sectionID = router.query.section.toString();
+
+    router.prefetch(`/${encodeURI(packageID)}/${encodeURI(sectionID)}`);
+  });
+
+  useEffect(() => {
     navigation.setFirstEntryState(false);
     if (!time.END_TIME) {
       router.push({

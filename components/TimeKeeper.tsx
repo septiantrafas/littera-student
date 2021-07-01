@@ -20,6 +20,11 @@ export const TimeKeeper = observer(() => {
   const toast_id = "time-reminder";
 
   useEffect(() => {
+    const packageID = timeStore.TIMEOUT_PATH.package;
+    const sectionID = timeStore.TIMEOUT_PATH.section;
+
+    router.prefetch(`/${encodeURI(packageID)}/${encodeURI(sectionID)}`);
+
     const timer = setTimeout(() => {
       const timeLeft = timeStore.calculateTimeLeft(timeStore.TIME);
 
@@ -50,12 +55,13 @@ export const TimeKeeper = observer(() => {
         router.push({
           pathname: "/[package]/[section]",
           query: {
-            package: timeStore.TIMEOUT_PATH.package,
-            section: timeStore.TIMEOUT_PATH.section,
+            package: packageID,
+            section: sectionID,
           },
         });
       }
     }, 1000);
+
     return () => {
       if (timer) {
         clearTimeout(timer);
