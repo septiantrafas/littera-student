@@ -149,18 +149,18 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
           // TODO: Change redirect path using navigationStore.current_path
           console.log("redirectPath:", JSON.stringify(redirectPath));
 
-        // if (navigation.CURRENT_PATH) {
-        //   const params = navigation.CURRENT_PATH.params;
-        //   router.push({
-        //     pathname: "/[package]/[section]",
-        //     query: {
-        //       package: params.package,
-        //       section: params.section,
-        //     },
-        //   });
-        // } else {
-        //   router.push(redirectPath);
-        // }
+          if (navigation.CURRENT_PATH) {
+            const params = navigation.CURRENT_PATH.params;
+            router.push({
+              pathname: "/[package]/[section]",
+              query: {
+                package: params.package,
+                section: params.section,
+              },
+            });
+          } else {
+            router.push(redirectPath);
+          }
       }
 
       if (progress === 100) {
