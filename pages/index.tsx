@@ -90,6 +90,13 @@ const Home: React.FC = () => {
   };
 
   useEffect(() => {
+    schedules &&
+      schedules.map(({ schedule }) => {
+        router.prefetch(`/${encodeURIComponent(schedule.package_id)}/lobby`);
+      });
+  }, [router, schedules]);
+
+  useEffect(() => {
     const handleAsync = async () => {
       if (user) {
         const query = `
@@ -114,7 +121,7 @@ const Home: React.FC = () => {
       }
     };
     handleAsync();
-  }, [navigation, user]);
+  }, [user]);
 
   if (!user) {
     return (
@@ -217,11 +224,6 @@ const Home: React.FC = () => {
                       size="sm"
                       rightIcon={<HiArrowRight />}
                       colorScheme="blue"
-                      onMouseEnter={() => {
-                        router.prefetch(
-                          `/${encodeURIComponent(schedule.package_id)}/lobby`
-                        );
-                      }}
                       onClick={() => {
                         navigation.schedule_id = parseInt(schedule.id);
                         router.push(

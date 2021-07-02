@@ -141,7 +141,7 @@ const ExamCategoryPage = (props: ISectionProps) => {
           Contoh Soal
         </Text>
         <Text>{props.context}</Text> */}
-        <NextLink href={redirectPath} passHref>
+        <NextLink href={redirectPath} prefetch={true} passHref>
           <Button type="button" data-cy="start-button" mt="6">
             Start
           </Button>
