@@ -15,7 +15,7 @@
     "@emotion/react": "^11.1.4",
     "@emotion/styled": "^11.0.0",
     "@next/bundle-analyzer": "^10.2.3",
-    "@supabase/supabase-js": "^1.6.0",
+    "@supabase/supabase-js": "^1.18.0",
     "@supabase/ui": "^0.21.2",
     "@zoomus/websdk": "^1.9.6",
     "dayjs": "^1.10.4",
