@@ -31,7 +31,7 @@ interface IScheduleResponse {
     exam_date: string;
     url: string;
     package_id: string;
-  }
+  };
 }
 
 const fetcher = (url, token) =>
@@ -44,7 +44,7 @@ const fetcher = (url, token) =>
 const Home: React.FC = () => {
   const router = useRouter();
   const toast = useToast();
-  const navigation = useNavigationStore()
+  const navigation = useNavigationStore();
   const { user, session } = Auth.useUser();
 
   const [email, setEmail] = useState("");
@@ -90,6 +90,13 @@ const Home: React.FC = () => {
   };
 
   useEffect(() => {
+    schedules &&
+      schedules.map(({ schedule }) => {
+        router.prefetch(`/${encodeURIComponent(schedule.package_id)}/lobby`);
+      });
+  }, [router, schedules]);
+
+  useEffect(() => {
     const handleAsync = async () => {
       if (user) {
         const query = `
@@ -102,7 +109,7 @@ const Home: React.FC = () => {
           package_id
         )
         `;
-        
+
         const res = await supabase
           .from<IScheduleResponse>("participants")
           .select(query)
@@ -114,7 +121,7 @@ const Home: React.FC = () => {
       }
     };
     handleAsync();
-  }, [navigation, user]);
+  }, [user]);
 
   if (!user) {
     return (
@@ -218,8 +225,10 @@ const Home: React.FC = () => {
                       rightIcon={<HiArrowRight />}
                       colorScheme="blue"
                       onClick={() => {
-                        navigation.schedule_id = parseInt(schedule.id)
-                        router.push(`/${encodeURIComponent(schedule.package_id)}/lobby`)
+                        navigation.schedule_id = parseInt(schedule.id);
+                        router.push(
+                          `/${encodeURIComponent(schedule.package_id)}/lobby`
+                        );
                       }}
                     >
                       Ikuti Asesmen

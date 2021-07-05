@@ -12,14 +12,15 @@ import { supabase } from "utils/initSupabase";
 import timezone from "dayjs/plugin/timezone";
 import NextLink from "next/link";
 import { Auth } from "@supabase/ui";
+import { log, Style } from "utils/consoleLogHelper";
 
 dayjs.extend(timezone);
 
 interface IAnswerBody {
-  schedule_id: number,
-  profile_id: string,
-  question_id: string,
-  value: string,
+  schedule_id: number;
+  profile_id: string;
+  question_id: string;
+  value: string;
 }
 
 type ISectionResponse = {
@@ -56,7 +57,7 @@ type ISectionProps = {
 
 const ExamCategoryPage = (props: ISectionProps) => {
   const store = useTimeStore();
-  const { route, isFallback } = useRouter();
+  const router = useRouter();
   const navigation = useNavigationStore();
   const { user, session } = Auth.useUser();
 
@@ -67,33 +68,39 @@ const ExamCategoryPage = (props: ISectionProps) => {
   const duration = end_time.diff(start_time, "minutes");
 
   useEffect(() => {
+    const isAnySelectedAnswer = navigation.ANSWERED_INDEX.length;
+    const isFirstEntry = navigation.FIRST_ENTRY;
+
+    log("isAnySelectedAnswer: " + isAnySelectedAnswer);
+    log("isFirstEntry: " + isFirstEntry);
+
     //TODO: CREATE A SUBMIT FEEDBACK SO USER KNOW WHAT'S GOING ON
-    if (navigation.ANSWERED_INDEX.length) {
+    if (isAnySelectedAnswer && !isFirstEntry) {
+      navigation.setFirstEntryState(false);
+      log("SUBMITTING");
       const body: IAnswerBody[] = navigation.ANSWERED_INDEX.map((item) => {
         return {
           schedule_id: navigation.schedule_id,
           profile_id: user.id,
           question_id: item.question_id,
           value: item.option_id.toString(),
-        }
+        };
       });
-      
+
       (async () => {
         try {
-          const res = await supabase
-          .from('answers')
-          .insert(body)
+          const res = await supabase.from("answers").insert(body);
 
-          navigation.clearStore()
+          navigation.clearStore();
         } catch (error) {
-          console.log(error)
+          console.log(error);
         }
-      })()
+      })();
     }
-  }, [navigation, navigation.ANSWERED_INDEX, user])
+  }, [navigation, navigation.ANSWERED_INDEX, user]);
 
   useEffect(() => {
-    if (!isFallback) {
+    if (!router.isFallback) {
       setRedirectPath({
         pathname: "/[package]/[section]/[question]",
         query: {
@@ -103,9 +110,9 @@ const ExamCategoryPage = (props: ISectionProps) => {
         },
       });
     }
-  }, [isFallback, navigation]);
+  }, [router.isFallback, navigation]);
 
-  if (isFallback) {
+  if (router.isFallback) {
     return (
       <>
         <Spinner size="lg" />
@@ -134,8 +141,8 @@ const ExamCategoryPage = (props: ISectionProps) => {
           Contoh Soal
         </Text>
         <Text>{props.context}</Text> */}
-        <NextLink href={redirectPath}>
-          <Button data-cy="start-button" mt="6">
+        <NextLink href={redirectPath} prefetch={true} passHref>
+          <Button type="button" data-cy="start-button" mt="6">
             Start
           </Button>
         </NextLink>

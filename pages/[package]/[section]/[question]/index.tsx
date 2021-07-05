@@ -58,7 +58,7 @@ type IQuestionProps = {
 };
 
 const ExamQuestionPage = (props: IQuestionProps) => {
-  const store = useNavigationStore();
+  const navigation = useNavigationStore();
   const time = useTimeStore();
   const router = useRouter();
   const { isFallback } = useRouter();
@@ -66,6 +66,14 @@ const ExamQuestionPage = (props: IQuestionProps) => {
   const [isOptionsUseImage, setOptionsUseImage] = useState(false);
 
   useEffect(() => {
+    const packageID = router.query.package.toString();
+    const sectionID = router.query.section.toString();
+
+    router.prefetch(`/${encodeURI(packageID)}/${encodeURI(sectionID)}`);
+  });
+
+  useEffect(() => {
+    navigation.setFirstEntryState(false);
     if (!time.END_TIME) {
       router.push({
         pathname: "/[package]/[section]",
@@ -75,7 +83,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
         },
       });
     }
-  }, [time.END_TIME, router]);
+  }, [time.END_TIME, router, navigation]);
 
   useEffect(() => {
     const imageNodeName =
@@ -89,13 +97,13 @@ const ExamQuestionPage = (props: IQuestionProps) => {
   }, [isFallback]);
 
   useEffect(() => {
-    const position = store.paths.findIndex(
+    const position = navigation.paths.findIndex(
       (arr) => arr.params.question.id === props.id
     );
 
-    const id = store.paths[position].params.question.id;
-    store.addToVisitedIndex(id);
-  }, [props.id, store]);
+    const id = navigation.paths[position].params.question.id;
+    navigation.addToVisitedIndex(id);
+  }, [props.id, navigation]);
 
   if (isFallback) {
     return (
@@ -109,17 +117,14 @@ const ExamQuestionPage = (props: IQuestionProps) => {
   return (
     <Flex height="95vh" bg={mode("white", "gray.800")}>
       <QuestionNavigator id={props.id} />
-      {!isOptionsUseImage && <Box
-        w="50%"
-        px="10"
-        py="12"
-        overflow="scroll"
-      >
-        <Text className="options-with-image">
-          {!props.text && ReactHtmlParser(props.question)}
-          {ReactHtmlParser(props.text)}
-        </Text>
-      </Box>}
+      {!isOptionsUseImage && (
+        <Box w="50%" px="10" py="12" overflow="scroll">
+          <Text className="options-with-image">
+            {!props.text && ReactHtmlParser(props.question)}
+            {ReactHtmlParser(props.text)}
+          </Text>
+        </Box>
+      )}
       <Box
         w={isOptionsUseImage ? "100%" : "50%"}
         px="10"
@@ -144,19 +149,19 @@ const ExamQuestionPage = (props: IQuestionProps) => {
           </Text>
           <RadioGroup
             onChange={(nextValue) =>
-              store.setAnsweredIndex({
+              navigation.setAnsweredIndex({
                 question_id: props.id,
                 option_id: parseFloat(nextValue),
               })
             }
-            value={store.getSelectedOption(props.id)}
+            value={navigation.getSelectedOption(props.id)}
             mt="6"
           >
             <Flex w="full" direction={isOptionsUseImage ? "row" : "column"}>
               {props.options?.map((item, index) => {
                 const number = index + 1;
                 const isItemSelected =
-                  store.getSelectedOption(props.id) === number;
+                  navigation.getSelectedOption(props.id) === number;
 
                 return (
                   <Box
@@ -188,7 +193,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                       isItemSelected ? "blue.600" : mode("gray.200", "gray.700")
                     }
                     onClick={() =>
-                      store.setAnsweredIndex({
+                      navigation.setAnsweredIndex({
                         question_id: props.id,
                         option_id: number,
                       })
@@ -218,7 +223,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                       cursor="pointer"
                       size="md"
                       onClick={() =>
-                        store.setAnsweredIndex({
+                        navigation.setAnsweredIndex({
                           question_id: props.id,
                           option_id: number,
                         })
@@ -239,13 +244,13 @@ const ExamQuestionPage = (props: IQuestionProps) => {
           <Flex w="full" alignItems="center" justifyContent="space-between">
             <NextLink
               href={
-                store.previous_path
+                navigation.previous_path
                   ? {
                       pathname: "/[package]/[section]/[question]",
                       query: {
-                        package: store.previous_path.params.package,
-                        section: store.previous_path.params.section,
-                        question: store.previous_path.params.question.id,
+                        package: navigation.previous_path.params.package,
+                        section: navigation.previous_path.params.section,
+                        question: navigation.previous_path.params.question.id,
                       },
                     }
                   : ""
@@ -255,7 +260,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                 variant="ghost"
                 textColor="gray.600"
                 leftIcon={<HiChevronLeft />}
-                isDisabled={!store.previous_path}
+                isDisabled={!navigation.previous_path}
               >
                 Back
               </Button>
@@ -263,13 +268,13 @@ const ExamQuestionPage = (props: IQuestionProps) => {
 
             <NextLink
               href={
-                store.next_path
+                navigation.next_path
                   ? {
                       pathname: "/[package]/[section]/[question]",
                       query: {
-                        package: store.next_path.params.package,
-                        section: store.next_path.params.section,
-                        question: store.next_path.params.question.id,
+                        package: navigation.next_path.params.package,
+                        section: navigation.next_path.params.section,
+                        question: navigation.next_path.params.question.id,
                       },
                     }
                   : ""
@@ -279,7 +284,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                 variant="ghost"
                 textColor="gray.600"
                 rightIcon={<HiChevronRight />}
-                isDisabled={!store.next_path}
+                isDisabled={!navigation.next_path}
               >
                 Next
               </Button>

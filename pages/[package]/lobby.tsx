@@ -2,7 +2,14 @@ import React, { useEffect, useState } from "react";
 import PageWithLayoutType from "@/types/pageWithLayout";
 
 import Default from "@/layouts/default";
-import { Box, Button, CircularProgress, Flex, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Flex,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { supabase } from "utils/initSupabase";
 import { useRouter } from "next/router";
@@ -11,6 +18,7 @@ import { useNavigationStore } from "providers/RootStoreProvider";
 import dynamic from "next/dynamic";
 import screenfull from "screenfull";
 import { HiOutlineRefresh } from "react-icons/hi";
+import { Auth } from "@supabase/ui";
 
 const LordIcon = dynamic(() => import("@/components/LordIcon"), {
   ssr: false,
@@ -23,29 +31,25 @@ type ILobbyProps = {
   };
 };
 
-type ILobbyStaticPaths = {
-  id: string;
-  packages: { id: string };
-};
-
-type LobbyState = {
-  isEligible: boolean;
-  redirectPath: string | UrlObject;
-};
+interface ISectionUrl {
+  pathname: string;
+  query?: {
+    package: string;
+    section: string;
+  };
+}
 
 const Lobby: React.FC<ILobbyProps> = (props) => {
   const { paths } = props;
 
+  const toast = useToast();
   const router = useRouter();
-  const navigationStore = useNavigationStore();
+  const { user, session } = Auth.useUser();
+  const navigation = useNavigationStore();
   const isDevelopment = process.env.NEXT_PUBLIC_ENVIRONMENT === "development";
 
-  // const [{ isEligible, redirectPath }, setState] = useState<LobbyState>({
-  //   isEligible: false,
-  //   redirectPath: "/verification",
-  // });
-
-  const [redirectPath, setRedirectPath] = useState<string | UrlObject>({
+  const [isEligible, setEligible] = useState(false);
+  const [redirectPath, setRedirectPath] = useState<ISectionUrl>({
     pathname: "/[package]/[section]",
     query: {
       package: paths.package.id,
@@ -59,9 +63,34 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
   const [isFullScreen, setFullScreen] = useState(false);
 
   useEffect(() => {
-    if (isDevelopment && paths && isFullScreen) {
+    if (navigation.CURRENT_PATH) {
+      const params = navigation.CURRENT_PATH.params;
+      router.prefetch(
+        `/${encodeURI(params.package)}/${encodeURI(params.section)}`
+      );
+    } else {
+      const query = redirectPath.query;
+      router.prefetch(
+        `/${encodeURI(query.package)}/${encodeURI(query.section)}`
+      );
+    }
+
+    if (isEligible === false && user) {
+      (async () => {
+        const res = await supabase
+          .from("participants")
+          .select(`id, profile_id`)
+          .match({ profile_id: user.id });
+
+        if (res.data.length) setEligible(true);
+      })();
+    }
+  }, [isEligible, navigation, redirectPath, router, user]);
+
+  useEffect(() => {
+    if (isDevelopment && paths && isFullScreen && user) {
       let timer = setInterval(() => {
-        setProgress(progress + 1);
+        setProgress(progress + 5);
         console.log(progress);
       }, 1000);
 
@@ -77,10 +106,37 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
         case 30:
           setIcon("/icons/fingerprint.json");
           setStatus("memverifikasi identitas...");
+
+          if (isEligible === false) {
+            setIcon("/icons/fingerprint.json");
+            setStatus("Maaf anda tidak berhak mengikuti tes");
+
+            clearInterval(timer);
+
+            toast({
+              id: "is_not_eligible",
+              title: "Peringatan",
+              description: "Maaf anda tidak berhak mengikuti tes",
+              status: "error",
+              duration: 2000,
+              isClosable: true,
+              position: "top",
+            });
+
+            setTimeout(() => {
+              router.push("/");
+            }, 3000);
+
+            return () => {
+              clearTimeout();
+            };
+          }
           break;
+
         case 40:
           setIcon("/icons/eye.json");
           setStatus("mempersiapkan lingkungan tes...");
+
           break;
         case 50:
           setIcon("/icons/conference.json");
@@ -89,8 +145,22 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
         case 100:
           setIcon("/icons/clock.json");
           setStatus("menunggu jadwal tes dimulai...");
-          // console.log("redirectPath:", redirectPath);
-          router.push(redirectPath);
+
+          // TODO: Change redirect path using navigationStore.current_path
+          console.log("redirectPath:", JSON.stringify(redirectPath));
+
+          if (navigation.CURRENT_PATH) {
+            const params = navigation.CURRENT_PATH.params;
+            router.push({
+              pathname: "/[package]/[section]",
+              query: {
+                package: params.package,
+                section: params.section,
+              },
+            });
+          } else {
+            router.push(redirectPath);
+          }
       }
 
       if (progress === 100) {
@@ -101,12 +171,25 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
         if (timer) {
           clearInterval(timer);
         }
+
+        navigation.setFirstEntryState(true);
       };
     } else if (isDevelopment && paths && !isFullScreen) {
       setIcon("/icons/error.json");
       setStatus("Menunggu akses diberikan...");
     }
-  }, [redirectPath, progress, isDevelopment, paths, router, isFullScreen]);
+  }, [
+    isDevelopment,
+    isEligible,
+    isFullScreen,
+    navigation,
+    paths,
+    progress,
+    redirectPath,
+    router,
+    toast,
+    user,
+  ]);
 
   useEffect(() => {
     if (screenfull.isEnabled) {
