@@ -13,10 +13,12 @@ import timezone from "dayjs/plugin/timezone";
 import NextLink from "next/link";
 import { Auth } from "@supabase/ui";
 import { log, Style } from "utils/consoleLogHelper";
+import { definitions } from "@/types/supabase";
 
 dayjs.extend(timezone);
 
 interface IAnswerBody {
+  id: string;
   schedule_id: number;
   profile_id: string;
   question_id: string;
@@ -80,6 +82,7 @@ const ExamCategoryPage = (props: ISectionProps) => {
       log("SUBMITTING");
       const body: IAnswerBody[] = navigation.ANSWERED_INDEX.map((item) => {
         return {
+          id: navigation.answer_map[item.question_id],
           schedule_id: navigation.schedule_id,
           profile_id: user.id,
           question_id: item.question_id,
@@ -88,10 +91,14 @@ const ExamCategoryPage = (props: ISectionProps) => {
       });
 
       (async () => {
+        console.log(body[0]);
         try {
-          const res = await supabase.from("answers").insert(body);
+          const res = await supabase
+            .from<definitions["answers"]>("answers")
+            .upsert(body, { onConflict: "id" });
 
-          navigation.clearStore();
+          console.log(res);
+          if (res) navigation.clearStore();
         } catch (error) {
           console.log(error);
         }

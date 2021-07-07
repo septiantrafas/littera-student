@@ -19,6 +19,7 @@ import dynamic from "next/dynamic";
 import screenfull from "screenfull";
 import { HiOutlineRefresh } from "react-icons/hi";
 import { Auth } from "@supabase/ui";
+import { definitions } from "@/types/supabase";
 
 const LordIcon = dynamic(() => import("@/components/LordIcon"), {
   ssr: false,
@@ -137,6 +138,19 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
           setIcon("/icons/eye.json");
           setStatus("mempersiapkan lingkungan tes...");
 
+          // Populate ANSWERED_INDEX
+          (async () => {
+            const res = await supabase
+              .from<definitions["answers"]>("answers")
+              .select("id, question_id")
+              .eq("profile_id", user.id);
+
+            // console.log(res.data);
+            res.data.map((answer) => {
+              navigation.answer_map[answer.question_id] = answer.id;
+            });
+          })();
+
           break;
         case 50:
           setIcon("/icons/conference.json");
@@ -146,7 +160,6 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
           setIcon("/icons/clock.json");
           setStatus("menunggu jadwal tes dimulai...");
 
-          // TODO: Change redirect path using navigationStore.current_path
           console.log("redirectPath:", JSON.stringify(redirectPath));
 
           if (navigation.CURRENT_PATH) {
