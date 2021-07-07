@@ -22,12 +22,12 @@ export const persistStore = (target, properties, persistName) => {
             "name:",
             name,
             "data:",
-            data
+            JSON.parse(data)
           );
         }
 
         // await new Promise((resolve) => setTimeout(resolve, 300)); // For hydrate simulation
-        return data ? JSON.parse(data) : undefined;
+        return data ? data : undefined;
       },
       write: async (name, content) => {
         if (isDevelopment) {
@@ -37,11 +37,11 @@ export const persistStore = (target, properties, persistName) => {
             "name:",
             name,
             "content:",
-            content
+            JSON.parse(content)
           );
         }
 
-        window.localStorage.setItem(name, JSON.stringify(content));
+        window.localStorage.setItem(name, content);
       },
     }),
     reactionOptions: {
