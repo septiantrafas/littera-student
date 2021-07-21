@@ -19,6 +19,10 @@ export type Paths = {
   };
 };
 
+export type AnswerTableMap = {
+  [key: string]: string;
+};
+
 type AnsweredIndex = {
   question_id: string;
   option_id: number;
@@ -38,6 +42,7 @@ export class NavigationStore {
   SCHEDULE_ID?: number;
   PATHS: Paths[];
   VISITED_INDEX: string[] = [];
+  ANSWER_MAP?: AnswerTableMap = {};
   ANSWERED_INDEX?: AnsweredIndex[] = [];
   PREVIOUS_PATH: Paths;
   CURRENT_PATH: Paths;
@@ -56,6 +61,7 @@ export class NavigationStore {
         "SCHEDULE_ID",
         "VISITED_INDEX",
         "FIRST_ENTRY",
+        "ANSWER_MAP",
       ],
       "NavigationStore"
     );
@@ -112,6 +118,14 @@ export class NavigationStore {
 
   set schedule_id(value) {
     this.SCHEDULE_ID = value;
+  }
+
+  get answer_map(): AnswerTableMap {
+    return this.ANSWER_MAP;
+  }
+
+  set answer_map(object: AnswerTableMap) {
+    this.ANSWER_MAP = object;
   }
 
   isVisited(index: string) {

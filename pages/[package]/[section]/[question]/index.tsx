@@ -192,12 +192,6 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                     borderColor={
                       isItemSelected ? "blue.600" : mode("gray.200", "gray.700")
                     }
-                    onClick={() =>
-                      navigation.setAnsweredIndex({
-                        question_id: props.id,
-                        option_id: number,
-                      })
-                    }
                     style={{
                       WebkitTransition: "box-shadow 250ms, transform 200ms",
                       transition: "box-shadow 250ms, transform 200ms",
