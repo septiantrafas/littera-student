@@ -128,13 +128,13 @@ const ExamQuestionPage = (props: IQuestionProps) => {
       <Box
         w={isOptionsUseImage ? "100%" : "50%"}
         px="10"
-        py="12"
         justifyContent="space-between"
         overflowY="scroll"
       >
         <Box
           maxW={isOptionsUseImage ? "full" : { xl: "2xl", "2xl": "3xl" }}
           mx="auto"
+          my="12"
         >
           <Text
             display="flex"
@@ -178,16 +178,17 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                         ? mode("blue.50", "gray.800")
                         : mode("white", "gray.800")
                     }
-                    color={
-                      isItemSelected
-                        ? mode("blue.800", "gray.200")
-                        : mode("gray.800", "gray.200")
-                    }
                     fontWeight={isItemSelected ? "medium" : "base"}
                     boxShadow={isItemSelected ? "outline" : "sm"}
+                    textColor={
+                      isItemSelected
+                        ? mode("blue.200", "blue.400")
+                        : mode("gray.200", "gray.400")
+                    }
                     _hover={{
                       boxShadow: isItemSelected ? "outline" : "base",
                       transform: "translateY(-2px)",
+                      textColor: isItemSelected ? "blue.500" : "gray.500",
                     }}
                     borderColor={
                       isItemSelected ? "blue.600" : mode("gray.200", "gray.700")
@@ -196,15 +197,17 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                       WebkitTransition: "box-shadow 250ms, transform 200ms",
                       transition: "box-shadow 250ms, transform 200ms",
                     }}
+                    onClick={() =>
+                      navigation.setAnsweredIndex({
+                        question_id: props.id,
+                        option_id: number,
+                      })
+                    }
                   >
                     <Text
                       fontSize="3xl"
                       fontWeight="bold"
-                      textColor={
-                        isItemSelected
-                          ? mode("blue.100", "blue.400")
-                          : mode("gray.100", "gray.400")
-                      }
+                      cursor="pointer"
                       my="auto"
                       mr="6"
                       textTransform="uppercase"
@@ -213,6 +216,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                     </Text>
                     <Radio
                       my="4"
+                      display="flex"
                       value={number}
                       cursor="pointer"
                       size="md"
@@ -224,9 +228,18 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                       }
                       hidden
                     >
-                      <div id="htmlRenderer" className="options-with-image">
+                      <Box
+                        id="htmlRenderer"
+                        className="options-with-image"
+                        cursor="pointer"
+                        color={
+                          isItemSelected
+                            ? mode("blue.800", "gray.200")
+                            : mode("gray.800", "gray.200")
+                        }
+                      >
                         {ReactHtmlParser(item.value)}
-                      </div>
+                      </Box>
                     </Radio>
                   </Box>
                 );
@@ -234,7 +247,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
             </Flex>
           </RadioGroup>
         </Box>
-        <Flex mt="4" w="full" alignItems="flex-end">
+        <Flex my="8" w="full" alignItems="flex-end">
           <Flex w="full" alignItems="center" justifyContent="space-between">
             <NextLink
               href={
@@ -256,7 +269,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                 leftIcon={<HiChevronLeft />}
                 isDisabled={!navigation.previous_path}
               >
-                Back
+                Kembali
               </Button>
             </NextLink>
 
@@ -280,7 +293,7 @@ const ExamQuestionPage = (props: IQuestionProps) => {
                 rightIcon={<HiChevronRight />}
                 isDisabled={!navigation.next_path}
               >
-                Next
+                Lanjut
               </Button>
             </NextLink>
           </Flex>
