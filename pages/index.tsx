@@ -58,9 +58,12 @@ const Home: React.FC = () => {
 
   const handleMagicLink = async (email) => {
     try {
-      const { user, session, error } = await supabase.auth.signIn({
-        email: email,
-      });
+      const { user, session, error } = await supabase.auth.signIn(
+        {
+          email: email,
+        },
+        { redirectTo: process.env.NEXT_PUBLIC_SUPABASE_REDIRECT_URL }
+      );
 
       if (error) {
         toast({
