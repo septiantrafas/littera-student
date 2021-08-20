@@ -1,16 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import PageWithLayoutType from "@/types/pageWithLayout";
 
 import Default from "@/layouts/default";
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Flex,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
-import { GetStaticPaths, GetStaticProps } from "next";
+import { Box, Button, Flex, Text, useToast } from "@chakra-ui/react";
 import { supabase } from "utils/initSupabase";
 import { useRouter } from "next/router";
 import { UrlObject } from "url";
@@ -25,11 +17,9 @@ const LordIcon = dynamic(() => import("@/components/LordIcon"), {
   ssr: false,
 });
 
-type ILobbyProps = {
-  paths: {
-    id: string;
-    package: { id: string };
-  };
+type IPaths = {
+  id: string;
+  package: { id: string };
 };
 
 interface ISectionUrl {
@@ -40,9 +30,7 @@ interface ISectionUrl {
   };
 }
 
-const Lobby: React.FC<ILobbyProps> = (props) => {
-  const { paths } = props;
-
+const Lobby: React.FC = () => {
   const toast = useToast();
   const router = useRouter();
   const { user, session } = Auth.useUser();
@@ -50,18 +38,50 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
   const isDevelopment = process.env.NEXT_PUBLIC_ENVIRONMENT === "development";
 
   const [isEligible, setEligible] = useState(false);
-  const [redirectPath, setRedirectPath] = useState<ISectionUrl>({
-    pathname: "/[package]/[section]",
-    query: {
-      package: paths.package.id,
-      section: paths.id,
-    },
-  });
+  const [paths, setPaths] = useState<IPaths>();
+  const [redirectPath, setRedirectPath] = useState<ISectionUrl>();
 
   const [progress, setProgress] = useState(10);
   const [status, setStatus] = useState("Menunggu akses diberikan...");
   const [icon, setIcon] = useState("/icons/error.json");
   const [isFullScreen, setFullScreen] = useState(false);
+
+  const fetchNextPath = useCallback(async () => {
+    const query = `
+      id,
+      package:package_id (id)
+    `;
+
+    if (router.query.package) {
+      try {
+        // TODO: Somehow at prerendering the router.query return an empty object 🤷‍♂️
+        console.log(router.query.package);
+        const res = await supabase
+          .from<any>("sections")
+          .select(query)
+          .match({ package_id: router.query.package })
+          .order("number", { ascending: true })
+          .limit(1)
+          .single();
+
+        setPaths(res.data);
+        setRedirectPath({
+          pathname: "/[package]/[section]",
+          query: {
+            package: res.data.package.id,
+            section: res.data.id,
+          },
+        });
+      } catch (error) {
+        console.error("response error:", error);
+        return { notFound: true };
+      }
+    }
+  }, [router.query.package]);
+
+  useEffect(() => {
+    fetchNextPath();
+  }, [fetchNextPath]);
 
   useEffect(() => {
     if (navigation.CURRENT_PATH) {
@@ -69,7 +89,7 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
       router.prefetch(
         `/${encodeURI(params.package)}/${encodeURI(params.section)}`
       );
-    } else {
+    } else if (redirectPath) {
       const query = redirectPath.query;
       router.prefetch(
         `/${encodeURI(query.package)}/${encodeURI(query.section)}`
@@ -210,7 +230,7 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
         setFullScreen(screenfull.isEnabled ? screenfull.isFullscreen : false);
       });
     }
-  });
+  }, []);
 
   return (
     <>
@@ -301,50 +321,6 @@ const Lobby: React.FC<ILobbyProps> = (props) => {
       </Flex>
     </>
   );
-};
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  return {
-    paths: [],
-    fallback: true,
-  };
-};
-
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  // TODO: Implement static type for supabase response
-  let data = null;
-
-  const query = `
-  id,
-  package:package_id (id)
-  `;
-
-  try {
-    const res = await supabase
-      .from<any>("sections") // TODO: Implement static type for supabase response
-      .select(query)
-      .match({ package_id: params.package.toString() })
-      .order("number", { ascending: true })
-      .limit(1);
-
-    data = res.data[0];
-  } catch (error) {
-    console.error("response error:", error);
-    return { notFound: true };
-  }
-
-  // Pass data to the page via props
-  try {
-    return {
-      props: {
-        paths: data,
-      },
-      revalidate: 60,
-    };
-  } catch (error) {
-    console.error(error);
-    return { notFound: true };
-  }
 };
 
 (Lobby as PageWithLayoutType).layout = Default;

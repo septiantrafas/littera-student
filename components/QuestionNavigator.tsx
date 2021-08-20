@@ -1,18 +1,8 @@
-import {
-  Box,
-  Button,
-  Text,
-  Grid,
-  useColorModeValue as mode,
-  Badge,
-  Flex,
-  Divider,
-} from "@chakra-ui/react";
+import { Box, Button, Grid, useColorModeValue as mode } from "@chakra-ui/react";
 import * as React from "react";
 import NextLink from "next/link";
 import { useNavigationStore } from "providers/RootStoreProvider";
 import { observer } from "mobx-react";
-import { HiArrowLeft, HiArrowRight } from "react-icons/hi";
 import { NavigationStore, Paths } from "@/stores/NavigationStore";
 
 function QuestionNavigator(props: { id: string }) {
@@ -43,7 +33,6 @@ const QuestionGrid = observer((props: QuestionGridProps) => {
   return (
     <Grid templateColumns="repeat(1, minmax(0, 1fr))" gap={2}>
       {store.paths.map((path) => {
-        const number = path.params.question.number;
         const isVisited = store.VISITED_INDEX.includes(path.params.question.id);
         const isActive = path.params.question.id === id;
         const isAnswered = store.isAnswered(path.params.question.id);

@@ -88,12 +88,28 @@ export class NavigationStore {
       data.current_instruction != null ? data.current_instruction : null;
   }
 
+  get current_instruction() {
+    return this.CURRENT_INSTRUCTION;
+  }
+
+  set current_instruction(value) {
+    this.CURRENT_INSTRUCTION = value;
+  }
+
   get paths() {
     return this.PATHS;
   }
 
   set paths(value: Paths[]) {
     this.PATHS = value;
+  }
+
+  get current_path() {
+    return this.CURRENT_PATH;
+  }
+
+  set current_path(value) {
+    this.CURRENT_PATH = value;
   }
 
   get next_path() {

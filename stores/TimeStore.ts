@@ -78,6 +78,15 @@ export class TimeStore {
     this.END_TIME = value;
   }
 
+  updateTimeoutPath(
+    value: {
+      package: string;
+      section: string;
+    } | null
+  ) {
+    this.TIMEOUT_PATH = value;
+  }
+
   calculateTimeLeft(time: string) {
     const now = dayjs(time);
     const end_time = dayjs(this.END_TIME);
