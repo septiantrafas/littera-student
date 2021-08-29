@@ -25,7 +25,6 @@ export const TimeKeeper = observer(() => {
 
       if (!timeStore.TIMEOUT_PATH.section) {
         timeout_path = `/${timeStore.TIMEOUT_PATH.package}/lobby`;
-        console.log(timeout_path);
       } else {
         const packageID = timeStore.TIMEOUT_PATH.package;
         const sectionID = timeStore.TIMEOUT_PATH.section;
@@ -42,9 +41,6 @@ export const TimeKeeper = observer(() => {
       const timer = setTimeout(() => {
         const timeLeft = timeStore.calculateTimeLeft(timeStore.TIME);
 
-        console.log("time:", timeStore.TIME);
-        console.log("end_time:", timeStore.END_TIME);
-        console.log("timeleft: ", timeLeft.unix());
         if (timeLeft.unix() > 0) {
           timeStore.updateTime(
             dayjs(timeStore.TIME).add(1, "seconds").toISOString()
@@ -74,6 +70,7 @@ export const TimeKeeper = observer(() => {
 
           setIsReminded(false);
           // reset next_path so it can be fetched in the next page
+          navigationStore.paths = [];
           navigationStore.next_path = null;
           router.push(timeout_path);
         }
@@ -89,13 +86,11 @@ export const TimeKeeper = observer(() => {
 
   // push to lobby if exam is not started
   useEffect(() => {
-    console.log("time:", timeStore.TIME);
     if (timeStore.TIME) {
       const now = dayjs(timeStore.TIME);
       const start_time = dayjs(timeStore.START_TIME);
 
       if (now.isBefore(start_time)) {
-        // console.log("This section is not started yet");
         router.push({
           pathname: "/[package]/[section]",
           query: {

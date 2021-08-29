@@ -165,7 +165,7 @@ const ExamQuestionPage: React.FC = () => {
   }, [data]);
 
   useEffect(() => {
-    if (navigation.paths && data?.id) {
+    if (navigation.paths?.length && data?.id) {
       const position = navigation.paths.findIndex(
         (arr) => arr.params.question.id === data.id
       );
@@ -173,7 +173,7 @@ const ExamQuestionPage: React.FC = () => {
       const id = navigation.paths[position].params.question.id;
       navigation.addToVisitedIndex(id);
     }
-  }, [navigation.paths, data?.id]);
+  }, [navigation.paths, data?.id, navigation]);
 
   // TODO: REFACTOR THIS TO COMPONENT BASED
   return (
