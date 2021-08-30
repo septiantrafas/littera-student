@@ -7,6 +7,7 @@ import {
   Box,
   Text,
   Spinner,
+  useToast,
   useDisclosure,
   Drawer,
   DrawerOverlay,
@@ -21,6 +22,7 @@ import { Auth } from "@supabase/ui";
 import { useRouter } from "next/router";
 import { useNavigationStore } from "providers/RootStoreProvider";
 import screenfull from "screenfull";
+import { supabase } from "utils/initSupabase";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -28,9 +30,11 @@ type LayoutProps = {
 
 const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
   // const { colorMode, toggleColorMode } = useColorMode();
+  const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigation = useNavigationStore();
   const [isFullScreen, setFullScreen] = useState(false);
+  const [isEligible, setEligible] = useState(false);
 
   const { user, session } = Auth.useUser();
   const router = useRouter();
@@ -43,6 +47,38 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
       });
     }
   });
+
+  useEffect(() => {
+    if (isEligible === false && user) {
+      (async () => {
+        const res = await supabase
+          .from("participants")
+          .select(`id, profile_id`)
+          .match({ profile_id: user.id });
+
+        if (res.data.length) setEligible(true);
+        if (!res.data.length) {
+          toast({
+            id: "is_not_eligible",
+            title: "Peringatan",
+            description: "Maaf anda tidak berhak mengikuti tes",
+            status: "error",
+            duration: 2000,
+            isClosable: true,
+            position: "top",
+          });
+
+          setTimeout(() => {
+            router.push("/");
+          }, 3000);
+
+          return () => {
+            clearTimeout();
+          };
+        }
+      })();
+    }
+  }, [isEligible, user]);
 
   useEffect(() => {
     if (screenfull.isEnabled) {

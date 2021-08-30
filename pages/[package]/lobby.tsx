@@ -84,18 +84,6 @@ const Lobby: React.FC = () => {
   }, [fetchNextPath]);
 
   useEffect(() => {
-    if (navigation.CURRENT_PATH) {
-      const params = navigation.CURRENT_PATH.params;
-      router.prefetch(
-        `/${encodeURI(params.package)}/${encodeURI(params.section)}`
-      );
-    } else if (redirectPath) {
-      const query = redirectPath.query;
-      router.prefetch(
-        `/${encodeURI(query.package)}/${encodeURI(query.section)}`
-      );
-    }
-
     if (isEligible === false && user) {
       (async () => {
         const res = await supabase
@@ -106,7 +94,7 @@ const Lobby: React.FC = () => {
         if (res.data.length) setEligible(true);
       })();
     }
-  }, [isEligible, navigation, redirectPath, router, user]);
+  }, [isEligible, user]);
 
   useEffect(() => {
     if (isDevelopment && paths && isFullScreen && user) {
