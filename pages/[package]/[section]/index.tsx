@@ -227,10 +227,18 @@ const ExamCategoryPage: React.FC = () => {
       {data && (
         <>
           <Box my="8">
-            <Text fontSize="xl" fontWeight="bold" textAlign="center">
+            <Text
+              textTransform="uppercase"
+              fontWeight="bold"
+              textAlign="center"
+              textColor="gray.500"
+            >
+              Bagian {data.number}
+            </Text>
+            <Text fontSize="2xl" fontWeight="bold" textAlign="center">
               {data.titles}
             </Text>
-            <Text fontSize="lg" textAlign="center">
+            <Text fontSize="sm" textAlign="center">
               Total Waktu {duration} Menit
             </Text>
           </Box>
