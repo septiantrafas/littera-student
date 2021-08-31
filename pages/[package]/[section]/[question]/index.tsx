@@ -181,10 +181,10 @@ const ExamQuestionPage: React.FC = () => {
       {data && (
         <Flex height="95vh" bg={mode("white", "gray.800")}>
           <QuestionNavigator id={data.id} />
-          {!isOptionsUseImage && (
+
+          {!!data.text && (
             <Box w="50%" px="10" py="12" overflow="scroll">
               <Text className="options-with-image">
-                {!data.text && ReactHtmlParser(data.question)}
                 {ReactHtmlParser(data.text)}
               </Text>
             </Box>
@@ -192,25 +192,30 @@ const ExamQuestionPage: React.FC = () => {
 
           <Box
             w={isOptionsUseImage ? "100%" : "50%"}
+            mx="auto"
             px="10"
             justifyContent="space-between"
             overflowY="scroll"
           >
             <Box
-              maxW={isOptionsUseImage ? "full" : { xl: "2xl", "2xl": "3xl" }}
+              maxW={
+                isOptionsUseImage || !data.text
+                  ? "full"
+                  : { xl: "2xl", "2xl": "3xl" }
+              }
               mx="auto"
               my="12"
             >
               <Text
                 display="flex"
+                flexDirection="column"
                 justifyContent="center"
                 alignItems="center"
-                fontWeight="semibold"
                 className="options-with-image"
               >
                 {data.text && ReactHtmlParser(data.question)}
-                {isOptionsUseImage && ReactHtmlParser(data.question)}
-                {!data.text && null}
+                {(isOptionsUseImage || !data.text) &&
+                  ReactHtmlParser(data.question)}
               </Text>
 
               <RadioGroup
