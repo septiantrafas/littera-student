@@ -50,6 +50,7 @@ const Home: React.FC = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [schedules, setSchedules] = useState<IScheduleResponse[]>(null);
+  const [isMeetRequirement, setIsMeetRequirement] = useState(false);
 
   const { data, error } = useSWR(
     session ? ["/api/getUser", session.access_token] : null,
@@ -188,7 +189,7 @@ const Home: React.FC = () => {
 
       <Flex minH="90vh" w="full" justifyContent="center" mt="6">
         <Flex maxW={{ base: "full", "2xl": "5xl" }} mx="6">
-          <RequirementCheck />
+          <RequirementCheck setIsMeetRequirement={setIsMeetRequirement} />
           <Box w="50%" mx="8">
             <Box alignItems="flex-end" mb="6">
               <Heading size="lg">Jadwal</Heading>
@@ -225,6 +226,7 @@ const Home: React.FC = () => {
                     <Button
                       mt="4"
                       size="sm"
+                      disabled={!isMeetRequirement}
                       rightIcon={<HiArrowRight />}
                       colorScheme="blue"
                       onClick={() => {
