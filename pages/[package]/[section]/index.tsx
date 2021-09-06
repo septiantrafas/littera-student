@@ -170,7 +170,7 @@ const ExamCategoryPage: React.FC = () => {
     //TODO: CREATE A SUBMIT FEEDBACK SO USER KNOW WHAT'S GOING ON
     if (isAnySelectedAnswer && !isFirstEntry) {
       navigationStore.setFirstEntryState(false);
-      log("SUBMITTING");
+      console.log("SUBMITTING");
       const body: IAnswerBody[] = navigationStore.ANSWERED_INDEX.map((item) => {
         return {
           id: navigationStore.answer_map[item.question_id],
@@ -186,7 +186,10 @@ const ExamCategoryPage: React.FC = () => {
         try {
           const res = await supabase
             .from<definitions["answers"]>("answers")
-            .upsert(body, { onConflict: "id" });
+            .upsert(body, {
+              returning: "minimal",
+              onConflict: "id",
+            });
 
           console.log(res);
           if (res) navigationStore.clearStore();
