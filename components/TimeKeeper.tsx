@@ -24,7 +24,7 @@ export const TimeKeeper = observer(() => {
       let timeout_path = null;
 
       if (!timeStore.TIMEOUT_PATH.section) {
-        timeout_path = `/${timeStore.TIMEOUT_PATH.package}/lobby`;
+        timeout_path = `/${timeStore.TIMEOUT_PATH.package}/thankyou`;
       } else {
         const packageID = timeStore.TIMEOUT_PATH.package;
         const sectionID = timeStore.TIMEOUT_PATH.section;
