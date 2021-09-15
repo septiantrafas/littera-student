@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Default from "@/layouts/default";
 import PageWithLayoutType from "@/types/pageWithLayout";
-import { useNavigationStore } from "providers/RootStoreProvider";
+import { useNavigationStore, useTimeStore } from "providers/RootStoreProvider";
 import { Auth } from "@supabase/ui";
 import { supabase } from "utils/initSupabase";
 import { definitions } from "@/types/supabase";
@@ -24,6 +24,7 @@ interface IAnswerBody {
 const ThankyouPage: React.FC = () => {
   const router = useRouter();
   const navigationStore = useNavigationStore();
+  const timeStore = useTimeStore();
   const { user } = Auth.useUser();
 
   const [isLoading, setLoading] = useState(false);
@@ -51,18 +52,14 @@ const ThankyouPage: React.FC = () => {
       (async () => {
         console.log(body[0]);
         try {
-          const res = await supabase
-            .from<definitions["answers"]>("answers")
-            .upsert(body, {
-              returning: "minimal",
-              onConflict: "id",
-            });
+          await supabase.from<definitions["answers"]>("answers").upsert(body, {
+            returning: "minimal",
+            onConflict: "id",
+          });
 
-          console.log(res);
-          if (res) {
-            navigationStore.clearStore();
-            setLoading(true);
-          }
+          navigationStore.clearStore();
+          timeStore.clearStore();
+          setLoading(false);
         } catch (error) {
           console.log(error);
         }

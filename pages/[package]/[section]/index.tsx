@@ -141,7 +141,10 @@ const ExamCategoryPage: React.FC = () => {
           timeStore.updateStartTime(
             dayjs().subtract(1, "minute").toISOString()
           );
-          timeStore.updateEndTime(dayjs().add(2, "minute").toISOString());
+          if(!timeStore.END_TIME){
+            timeStore.updateEndTime(dayjs().add(2, "minute").toISOString());
+          }
+          
           timeStore.updateTimeoutPath(next_section_url);
           timeStore.updateTime(time);
         } else {
