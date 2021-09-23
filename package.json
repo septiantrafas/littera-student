@@ -17,7 +17,7 @@
     "@next/bundle-analyzer": "^10.2.3",
     "@supabase/supabase-js": "^1.18.0",
     "@supabase/ui": "^0.21.2",
-    "@zoomus/websdk": "^1.9.6",
+    "@zoomus/websdk": "^1.9.7",
     "dayjs": "^1.10.4",
     "emotion-theming": "^11.0.0",
     "focus-visible": "^5.2.0",

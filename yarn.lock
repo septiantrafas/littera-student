@@ -1130,12 +1130,12 @@
     "@typescript-eslint/types" "4.27.0"
     eslint-visitor-keys "^2.0.0"
 
-"@zoomus/websdk@^1.9.6":
-  version "1.9.6"
-  resolved "https://registry.yarnpkg.com/@zoomus/websdk/-/websdk-1.9.6.tgz#ccc8205c1e08a9702ccfcf4bd45669e306bcc685"
-  integrity sha512-Alm4wpuF9wNvFipu9FB5JonqfTnqN+RSnwKt75YTdSjwZlCR6B5f2WcKrKAUMbHJ2BhKEZuGnpVVTsQdv9nfww==
+"@zoomus/websdk@^1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@zoomus/websdk/-/websdk-1.9.7.tgz#3ae24bc87923ee72651de5e60c6c058ca94756b2"
+  integrity sha512-7k/NmihhBfPymhgFwdO7xfLS9YggH2szA7+kGQ8M8q6TcfDSB3/s0dM8a4ediCoSKbTUbh1oMXSiYZfYj4GCwQ==
   dependencies:
-    lodash "^4.17.14"
+    lodash "^4.17.21"
     react "16.8.6"
     react-dom "16.8.6"
     react-redux "7.1.0"
@@ -3979,7 +3979,7 @@ lodash.truncate@^4.4.2:
   resolved "https://registry.yarnpkg.com/lodash.truncate/-/lodash.truncate-4.4.2.tgz#5a350da0b1113b837ecfffd5812cbe58d6eae193"
   integrity sha1-WjUNoLERO4N+z//VgSy+WNbq4ZM=
 
-lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.2.1:
+lodash@^4.17.13, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.2.1:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==

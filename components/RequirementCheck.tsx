@@ -21,7 +21,12 @@ type IDynamicListIconProps = {
   content: string;
 };
 
-export const RequirementCheck: React.FC = () => {
+interface Props {
+  setIsMeetRequirement: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const RequirementCheck: React.FC<Props> = (props) => {
+  const { setIsMeetRequirement } = props;
   const { user, session } = Auth.useUser();
   const [identity, setIdentity] = useState("");
   const [isIdentityAvailable, setIsIdentityAvailable] = useState(false);
@@ -54,6 +59,7 @@ export const RequirementCheck: React.FC = () => {
         .getUserMedia({ video: true, audio: true })
         .then(function (stream) {
           setisMediaAvailable(true);
+          setIsMeetRequirement(true);
 
           console.info("Media Permission Success!");
 

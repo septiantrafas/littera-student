@@ -1,3 +1,4 @@
+import React from "react";
 import dynamic from "next/dynamic";
 
 // ZoomWindow component should be rendered on client (SSR breaks Zoom WebSDK)
@@ -10,9 +11,15 @@ import PageWithLayoutType from "@/types/pageWithLayout";
 import Default from "@/layouts/default";
 
 const Meeting: React.FC = () => {
+  // https://us02web.zoom.us/j/84824434988?pwd=RGZRUjFzNGhHdWxrTVg5RVFTSHBnZz09
   return (
     <>
-      <ZoomWindow />
+      <ZoomWindow
+        meetingNumber="84824434988"
+        username="Testing"
+        password="RGZRUjFzNGhHdWxrTVg5RVFTSHBnZz09"
+      />
+      {/* <ZoomWindow /> */}
     </>
   );
 };

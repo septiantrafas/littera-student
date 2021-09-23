@@ -10,6 +10,8 @@ import { RootStore } from "@/stores/RootStore";
 import { io } from "socket.io-client";
 import dayjs, { Dayjs } from "dayjs";
 import duration from "dayjs/plugin/duration";
+import { persistStore } from "utils/persistStore";
+import { clearPersist } from "mobx-persist-store";
 
 dayjs.extend(duration);
 
@@ -40,7 +42,18 @@ export class TimeStore {
   constructor(root: RootStore) {
     this.root = root;
     makeAutoObservable(this);
+    persistStore(this, ["END_TIME"], "TimeStore");
   }
+
+  clearStore = () => {
+    try {
+      clearPersist(this);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
 
   hydrate(data: TimeHydration) {
     const isProduction = process.env.NEXT_PUBLIC_ENVIRONMENT === "production";
@@ -51,7 +64,8 @@ export class TimeStore {
         this.TIME = dayjs().toISOString();
       }
       this.START_TIME = dayjs().subtract(1, "minute").toISOString();
-      this.END_TIME = dayjs().add(2, "minute").toISOString();
+      // this.END_TIME = dayjs().add(2, "minute").toISOString();
+      this.END_TIME = data.end_time != null ? data.end_time : "";
       this.TIMEOUT_PATH = data.timeout_path != null ? data.timeout_path : null;
     }
 
@@ -76,6 +90,15 @@ export class TimeStore {
 
   updateEndTime(value: string) {
     this.END_TIME = value;
+  }
+
+  updateTimeoutPath(
+    value: {
+      package: string;
+      section: string;
+    } | null
+  ) {
+    this.TIMEOUT_PATH = value;
   }
 
   calculateTimeLeft(time: string) {
