@@ -35,6 +35,7 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
   const navigation = useNavigationStore();
   const [isFullScreen, setFullScreen] = useState(false);
   const [isEligible, setEligible] = useState(false);
+  const [participant, handleUpdatedParticipant] = useState(null);
 
   const { user, session } = Auth.useUser();
   const router = useRouter();
@@ -49,36 +50,43 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
   });
 
   useEffect(() => {
-    if (isEligible === false && user) {
-      (async () => {
-        const res = await supabase
-          .from("participants")
-          .select(`id, profile_id`)
-          .match({ profile_id: user.id });
+    const userListener = supabase
+      .from(`participants:profile_id=eq.${user.id}`)
+      .on("UPDATE", (payload) => handleUpdatedParticipant(payload.new))
+      .subscribe();
 
-        if (res.data.length) setEligible(true);
-        if (!res.data.length) {
-          toast({
-            id: "is_not_eligible",
-            title: "Peringatan",
-            description: "Maaf anda tidak berhak mengikuti tes",
-            status: "error",
-            duration: 2000,
-            isClosable: true,
-            position: "top",
-          });
+    return () => {
+      userListener.unsubscribe();
+    };
+  }, []);
 
-          setTimeout(() => {
-            router.push("/");
-          }, 3000);
+  useEffect(() => {
+    console.log(participant);
 
-          return () => {
-            clearTimeout();
-          };
-        }
-      })();
+    if (participant) {
+      if (participant.status === "online") {
+        setEligible(true);
+      } else if (participant.status !== "online") {
+        toast({
+          id: "is_not_eligible",
+          title: "Peringatan",
+          description: "Maaf anda tidak berhak mengikuti tes",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+          position: "top",
+        });
+
+        setTimeout(() => {
+          router.push("/");
+        }, 3000);
+
+        return () => {
+          clearTimeout();
+        };
+      }
     }
-  }, [isEligible, user]);
+  }, [user, participant]);
 
   useEffect(() => {
     if (screenfull.isEnabled) {
