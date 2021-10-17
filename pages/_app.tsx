@@ -11,12 +11,14 @@ import { Auth } from "@supabase/ui";
 import { supabase } from "utils/initSupabase";
 import NProgress from "nprogress";
 import Router from "next/router";
-import Head from "next/head";
 
 import "focus-visible/dist/focus-visible";
 import "styles/supabase.css";
 import "styles/globals.css";
-import { useEffect } from "react";
+
+import ZoomContext from 'contexts/ZoomClientContext'
+import { useEffect, useState } from "react";
+
 
 type AppLayoutProps = {
   Component: PageWithLayoutType;
@@ -34,25 +36,42 @@ Router.events.on("routeChangeError", () => NProgress.done());
 const MyApp: NextComponentType<AppContext, AppInitialProps, AppLayoutProps> = (
   props
 ) => {
+  const [client, setClient] = useState<any>(null)
   const { Component, pageProps } = props;
   const Layout = Component.layout || ((children) => <>{children}</>);
 
+  useEffect(() => {
+    var ZoomVideo = require('@zoom/videosdk')
+
+    if (client) {
+      client.init()
+    } else {
+      setClient(ZoomVideo.default.createClient())
+    }
+  }, [client])
+
+  if (!client) {
+    return <span>loading...</span>
+
+  }
   return (
     <>
       <Chakra theme={theme} cookies={pageProps.cookies}>
         <CSSReset />
-        <Auth.UserContextProvider supabaseClient={supabase}>
-          <RootStoreProvider hydrationData={pageProps.hydrationData}>
-            <CypressStoreProvider />
-            {!Component.layout ? (
-              <Component {...pageProps} />
-            ) : (
-              <Layout>
+        <ZoomContext.Provider value={client}>
+          <Auth.UserContextProvider supabaseClient={supabase}>
+            <RootStoreProvider hydrationData={pageProps.hydrationData}>
+              <CypressStoreProvider />
+              {!Component.layout ? (
                 <Component {...pageProps} />
-              </Layout>
-            )}
-          </RootStoreProvider>
-        </Auth.UserContextProvider>
+              ) : (
+                <Layout>
+                  <Component {...pageProps} />
+                </Layout>
+              )}
+            </RootStoreProvider>
+          </Auth.UserContextProvider>
+        </ZoomContext.Provider>
       </Chakra>
     </>
   );

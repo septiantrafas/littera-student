@@ -117,7 +117,6 @@ const Lobby: React.FC = () => {
           setStatus("memverifikasi identitas...");
 
           if (isEligible === false) {
-            setIcon("/icons/fingerprint.json");
             setStatus("Maaf anda tidak berhak mengikuti tes");
 
             clearInterval(timer);
@@ -147,17 +146,16 @@ const Lobby: React.FC = () => {
           setStatus("mempersiapkan lingkungan tes...");
 
           // Populate ANSWERED_INDEX
-          (async () => {
-            const res = await supabase
-              .from<definitions["answers"]>("answers")
-              .select("id, question_id")
-              .eq("profile_id", user.id);
+          //           (async () => {
+          //             const res = await supabase
+          //               .from<definitions["answers"]>("answers")
+          //               .select("id, question_id")
+          //               .eq("profile_id", user.id);
 
-            // console.log(res.data);
-            res.data.map((answer) => {
-              navigation.answer_map[answer.question_id] = answer.id;
-            });
-          })();
+          //             res.data.map((answer) => {
+          //               navigation.answer_map[answer.question_id] = answer.id;
+          //             });
+          //           })();
 
           break;
         case 50:

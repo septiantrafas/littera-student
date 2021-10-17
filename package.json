@@ -17,12 +17,13 @@
     "@next/bundle-analyzer": "^10.2.3",
     "@supabase/supabase-js": "^1.18.0",
     "@supabase/ui": "^0.21.2",
-    "@zoomus/websdk": "^1.9.7",
+    "@zoom/videosdk": "^1.1.5",
     "dayjs": "^1.10.4",
     "emotion-theming": "^11.0.0",
     "focus-visible": "^5.2.0",
     "formik": "^2.2.8",
     "framer-motion": "^4.1.17",
+    "jsrsasign": "^10.4.1",
     "lord-icon-element": "^2.0.2",
     "lottie-web": "^5.7.11",
     "mobx": "^6.1.8",
@@ -40,6 +41,7 @@
     "swr": "^0.4.2"
   },
   "devDependencies": {
+    "@types/jsrsasign": "^8.0.13",
     "@types/node": "^14.14.20",
     "@types/react": "^17.0.0",
     "cypress": "7.1.0",

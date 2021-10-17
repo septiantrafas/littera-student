@@ -45,6 +45,7 @@ export const TimeKeeper = observer(() => {
           timeStore.updateTime(
             dayjs(timeStore.TIME).add(1, "seconds").toISOString()
           );
+
           document.getElementById("time").innerHTML =
             timeLeft.format("HH:mm:ss");
 
@@ -65,10 +66,17 @@ export const TimeKeeper = observer(() => {
               position: "top",
             });
           }
+        } else if (navigationStore.ANSWERED_INDEX.length > 0) {
+          console.log("this block executed")
+          timeStore.updateEndTime(
+            dayjs().add(1, "minute").toISOString()
+          );
         } else {
           document.getElementById("time").innerHTML = "00:00:00";
 
           setIsReminded(false);
+          // clelar timestore
+          timeStore.clearStore()
           // reset next_path so it can be fetched in the next page
           navigationStore.paths = [];
           navigationStore.next_path = null;
@@ -82,7 +90,7 @@ export const TimeKeeper = observer(() => {
         }
       };
     }
-  }, [isReminded, navigationStore, router, timeStore, timeStore.TIME, toast]);
+  }, [isReminded, navigationStore, router, timeStore, timeStore.TIME, timeStore.END_TIME, toast]);
 
   // push to lobby if exam is not started
   useEffect(() => {

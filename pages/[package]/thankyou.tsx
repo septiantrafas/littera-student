@@ -57,13 +57,14 @@ const ThankyouPage: React.FC = () => {
             onConflict: "id",
           });
 
-          navigationStore.clearStore();
-          timeStore.clearStore();
           setLoading(false);
         } catch (error) {
           console.log(error);
         }
       })();
+
+      navigationStore.clearStore();
+      timeStore.clearStore();
     }
   }, [navigationStore, navigationStore.ANSWERED_INDEX, user]);
 

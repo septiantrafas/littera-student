@@ -45,9 +45,9 @@ export class TimeStore {
     persistStore(this, ["END_TIME"], "TimeStore");
   }
 
-  clearStore = () => {
+  clearStore = async () => {
     try {
-      clearPersist(this);
+      await clearPersist(this.END_TIME);
       return true;
     } catch (error) {
       console.error(error);

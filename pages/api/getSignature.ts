@@ -1,33 +1,41 @@
-import crypto from "crypto";
+import { KJUR } from "jsrsasign";
 
-const getUser = async (req, res) => {
-  const timestamp = new Date().getTime() - 30000;
+interface Request {
+  body: {
+    topic: string,
+    password: string,
+  }
+}
 
-  console.log("meetingNumber", req.body.meetingNumber);
-  console.log("role", req.body.role);
+const getSignature = async (req: Request, res: any) => {
+  const { topic, password } = req.body
 
-  console.log("API_KEY", process.env.NEXT_PUBLIC_ZOOM_API_KEY);
-  console.log("API_SECRET", process.env.NEXT_PUBLIC_ZOOM_API_SECRET);
+  const sdkKey = process.env.NEXT_PUBLIC_ZOOM_SDK_KEY
+  const sdkSecret = process.env.NEXT_PUBLIC_ZOOM_SDK_SECRET
 
-  const msg = Buffer.from(
-    process.env.NEXT_PUBLIC_ZOOM_API_KEY +
-      req.body.meetingNumber +
-      timestamp +
-      req.body.role
-  ).toString("base64");
+  // try {
+  const iat = Math.round(new Date().getTime() / 1000);
+  const exp = iat + 60 * 60 * 2;
 
-  const hash = crypto
-    .createHmac("sha256", process.env.NEXT_PUBLIC_ZOOM_API_SECRET)
-    .update(msg)
-    .digest("base64");
+  // Header
+  const oHeader = { alg: "HS256", typ: "JWT" };
 
-  const signature = Buffer.from(
-    `${process.env.NEXT_PUBLIC_ZOOM_API_KEY}.${req.body.meetingNumber}.${timestamp}.${req.body.role}.${hash}`
-  ).toString("base64");
+  // Payload
+  const oPayload = {
+    app_key: sdkKey,
+    iat,
+    exp,
+    tpc: topic,
+    pwd: password,
+  };
+
+  // Sign JWT
+  const sHeader = JSON.stringify(oHeader);
+  const sPayload = JSON.stringify(oPayload);
 
   return res.status(200).json({
-    signature: signature,
+    signature: KJUR.jws.JWS.sign("HS256", sHeader, sPayload, sdkSecret),
   });
 };
 
-export default getUser;
+export default getSignature;

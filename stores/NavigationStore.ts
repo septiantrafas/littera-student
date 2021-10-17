@@ -67,11 +67,11 @@ export class NavigationStore {
     );
   }
 
-  clearStore = () => {
+  clearStore = async () => {
     try {
       this.ANSWERED_INDEX = [];
       this.VISITED_INDEX = [];
-      clearPersist(this);
+      await clearPersist(this);
       return true;
     } catch (error) {
       console.error(error);
