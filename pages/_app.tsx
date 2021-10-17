@@ -42,11 +42,16 @@ const MyApp: NextComponentType<AppContext, AppInitialProps, AppLayoutProps> = (
 
   useEffect(() => {
     var ZoomVideo = require('@zoom/videosdk')
-    setClient(ZoomVideo.default.createClient())
-  }, [])
+
+    if (client) {
+      client.init()
+    } else {
+      setClient(ZoomVideo.default.createClient())
+    }
+  }, [client])
 
   if (!client) {
-    return "loading..."
+    return <span>"loading..."</span>
 
   }
   return (
