@@ -51,7 +51,7 @@ const MyApp: NextComponentType<AppContext, AppInitialProps, AppLayoutProps> = (
   }, [client])
 
   if (!client) {
-    return <span>"loading..."</span>
+    return <span>loading...</span>
 
   }
   return (
