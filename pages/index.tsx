@@ -208,7 +208,7 @@ const Home: React.FC = () => {
               </Box>
             )}
             {schedules &&
-              schedules.map(({ schedule }) => (
+              schedules.map(({ id, schedule }) => (
                 <Box
                   key={schedule.name}
                   borderWidth="1px"
@@ -231,6 +231,7 @@ const Home: React.FC = () => {
                       colorScheme="blue"
                       onClick={() => {
                         navigation.schedule_id = parseInt(schedule.id);
+                        navigation.participant = parseInt(id)
                         router.push(
                           `/${encodeURIComponent(schedule.package_id)}/lobby`
                         );

@@ -58,7 +58,7 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
     return () => {
       userListener.unsubscribe();
     };
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     console.log(participant);

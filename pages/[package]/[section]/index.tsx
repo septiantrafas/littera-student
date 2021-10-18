@@ -20,7 +20,7 @@ dayjs.extend(timezone);
 interface IAnswerBody {
   id: string;
   schedule_id: number;
-  profile_id: string;
+  participant_id: number;
   question_id: string;
   value: string;
 }
@@ -110,13 +110,13 @@ const ExamCategoryPage: React.FC = () => {
 
       const next_section_url = next_section
         ? {
-            package: next_section.package,
-            section: next_section.section,
-          }
+          package: next_section.package,
+          section: next_section.section,
+        }
         : {
-            package: params.package,
-            section: null,
-          };
+          package: params.package,
+          section: null,
+        };
 
       const next_path = {
         params: {
@@ -135,16 +135,18 @@ const ExamCategoryPage: React.FC = () => {
       const duration = endTime.diff(startTime, "minutes");
 
       console.log("section_time", time);
+      const timeLeft = timeStore.calculateTimeLeft(timeStore.TIME);
 
       if (!navigationStore.NEXT_PATH) {
         if (isDevelopment) {
           timeStore.updateStartTime(
             dayjs().subtract(1, "minute").toISOString()
           );
-          if(!timeStore.END_TIME){
+
+          if (timeLeft.unix() <= 0) {
             timeStore.updateEndTime(dayjs().add(2, "minute").toISOString());
           }
-          
+
           timeStore.updateTimeoutPath(next_section_url);
           timeStore.updateTime(time);
         } else {
@@ -178,7 +180,7 @@ const ExamCategoryPage: React.FC = () => {
         return {
           id: navigationStore.answer_map[item.question_id],
           schedule_id: navigationStore.schedule_id,
-          profile_id: user.id,
+          participant_id: navigationStore.participant,
           question_id: item.question_id,
           value: item.option_id.toString(),
         };

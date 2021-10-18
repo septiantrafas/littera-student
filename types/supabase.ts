@@ -1052,7 +1052,7 @@ export interface definitions {
      * Note:
      * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
      */
-    profile_id: string;
+    participant_id: number;
     question_id: string;
     value: string;
     created_at: string;
@@ -1288,6 +1288,6 @@ export interface parameters {
   "rowFilter.sections.updated_at": string;
 }
 
-export interface operations {}
+export interface operations { }
 
-export interface external {}
+export interface external { }
