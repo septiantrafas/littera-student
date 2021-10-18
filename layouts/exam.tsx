@@ -50,15 +50,17 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
   });
 
   useEffect(() => {
-    const userListener = supabase
-      .from(`participants:profile_id=eq.${user.id}`)
-      .on("UPDATE", (payload) => handleUpdatedParticipant(payload.new))
-      .subscribe();
+    if (user) {
+      const userListener = supabase
+        .from(`participants:profile_id=eq.${user.id}`)
+        .on("UPDATE", (payload) => handleUpdatedParticipant(payload.new))
+        .subscribe();
 
-    return () => {
-      userListener.unsubscribe();
-    };
-  }, []);
+      return () => {
+        userListener.unsubscribe();
+      };
+    }
+  }, [user]);
 
   useEffect(() => {
     console.log(participant);

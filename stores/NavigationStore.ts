@@ -49,6 +49,7 @@ export class NavigationStore {
   NEXT_PATH: Paths;
   CURRENT_INSTRUCTION: string;
   FIRST_ENTRY: boolean;
+  PARTICIPANT: number;
 
   constructor(root: RootStore) {
     this.root = root;
@@ -62,6 +63,7 @@ export class NavigationStore {
         "VISITED_INDEX",
         "FIRST_ENTRY",
         "ANSWER_MAP",
+        "PARTICIPANT"
       ],
       "NavigationStore"
     );
@@ -143,6 +145,15 @@ export class NavigationStore {
   set answer_map(object: AnswerTableMap) {
     this.ANSWER_MAP = object;
   }
+
+  get participant() {
+    return this.PARTICIPANT
+  }
+
+  set participant(id: number) {
+    this.PARTICIPANT = id
+  }
+
 
   isVisited(index: string) {
     return this.VISITED_INDEX.includes(index);
