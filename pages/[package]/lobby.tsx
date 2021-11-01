@@ -45,6 +45,8 @@ const Lobby: React.FC = () => {
   const [status, setStatus] = useState("Menunggu akses diberikan...");
   const [icon, setIcon] = useState("/icons/error.json");
   const [isFullScreen, setFullScreen] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [participantStatus, setParticipantStatus] = useState("");
 
   const fetchNextPath = useCallback(async () => {
     const query = `
@@ -86,21 +88,45 @@ const Lobby: React.FC = () => {
   useEffect(() => {
     if (isEligible === false && user) {
       (async () => {
-        const res = await supabase
+        const { data, error } = await supabase
           .from("participants")
-          .select(`id, profile_id`)
-          .match({ profile_id: user.id });
+          .select(`id, profile_id, status`)
+          .match({ profile_id: user.id })
+          .single();
 
-        if (res.data.length) setEligible(true);
+        if (data) {
+          setEligible(true)
+          setParticipantStatus(data.status)
+        };
+
+        if (error) {
+          console.log(error)
+        }
+        console.log("Profile Status:", data.status)
       })();
     }
-  }, [isEligible, user]);
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      const userListener = supabase
+        .from(`participants:profile_id=eq.${user.id}`)
+        .on("UPDATE", (payload) => setParticipantStatus(payload.new.status))
+        .subscribe();
+
+      return () => {
+        userListener.unsubscribe();
+      };
+    }
+  }, [user]);
 
   useEffect(() => {
     if (isDevelopment && paths && isFullScreen && user) {
       let timer = setInterval(() => {
-        setProgress(progress + 5);
-        console.log(progress);
+        if (!paused) {
+          setProgress(progress + 5);
+          console.log(progress);
+        }
       }, 1000);
 
       switch (progress) {
@@ -115,6 +141,14 @@ const Lobby: React.FC = () => {
         case 30:
           setIcon("/icons/fingerprint.json");
           setStatus("memverifikasi identitas...");
+
+          if (participantStatus !== "online") {
+            setPaused(true)
+            setStatus("Menunggu verifikasi pengawas")
+          } else {
+            setPaused(false)
+            setProgress(40) //Jump to case 40 (Preparing test environment)
+          }
 
           if (isEligible === false) {
             setStatus("Maaf anda tidak berhak mengikuti tes");
@@ -198,6 +232,8 @@ const Lobby: React.FC = () => {
       setStatus("Menunggu akses diberikan...");
     }
   }, [
+    participantStatus,
+    paused,
     isDevelopment,
     isEligible,
     isFullScreen,
