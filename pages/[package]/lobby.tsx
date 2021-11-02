@@ -141,15 +141,6 @@ const Lobby: React.FC = () => {
         case 30:
           setIcon("/icons/fingerprints.json");
           setStatus("memverifikasi identitas...");
-          break;
-        case 35:
-          if (participantStatus !== "online") {
-            setPaused(true)
-            setStatus("Menunggu verifikasi pengawas")
-          } else {
-            setPaused(false)
-            setProgress(40) //Jump to case 40 (Preparing test environment)
-          }
 
           if (isEligible === false) {
             setStatus("Maaf anda tidak berhak mengikuti tes");
@@ -174,6 +165,15 @@ const Lobby: React.FC = () => {
               clearTimeout();
             };
           }
+
+          if (participantStatus !== "online") {
+            setPaused(true)
+            setStatus("Menunggu verifikasi pengawas")
+          } else {
+            setPaused(false)
+            setProgress(40) //Jump to case 40 (Preparing test environment)
+          }
+
           break;
 
         case 40:
