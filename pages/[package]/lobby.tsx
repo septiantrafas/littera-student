@@ -139,9 +139,10 @@ const Lobby: React.FC = () => {
           setStatus("mengecek akses perangkat...");
           break;
         case 30:
-          setIcon("/icons/fingerprint.json");
+          setIcon("/icons/fingerprints.json");
           setStatus("memverifikasi identitas...");
-
+          break;
+        case 35:
           if (participantStatus !== "online") {
             setPaused(true)
             setStatus("Menunggu verifikasi pengawas")
