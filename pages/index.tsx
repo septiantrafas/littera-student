@@ -13,6 +13,7 @@ import {
   Skeleton,
   Input,
   useToast,
+  Badge,
 } from "@chakra-ui/react";
 import { supabase } from "utils/initSupabase";
 import useSWR from "swr";
@@ -25,6 +26,7 @@ import { useNavigationStore } from "providers/RootStoreProvider";
 
 interface IScheduleResponse {
   id: string;
+  status?: string;
   schedule: {
     id: string;
     name: string;
@@ -105,6 +107,7 @@ const Home: React.FC = () => {
       if (user) {
         const query = `
         id,
+        status,
         schedule:schedule_id (
           id,
           name,
@@ -208,7 +211,7 @@ const Home: React.FC = () => {
               </Box>
             )}
             {schedules &&
-              schedules.map(({ id, schedule }) => (
+              schedules.map(({ id, status, schedule }) => (
                 <Box
                   key={schedule.name}
                   borderWidth="1px"
@@ -217,7 +220,10 @@ const Home: React.FC = () => {
                   bg="white"
                   p="6"
                 >
-                  <Heading fontSize="2xl">{schedule.name}</Heading>
+                  <Flex alignItems="center" justifyContent="space-between">
+                    <Heading fontSize="2xl">{schedule.name}</Heading>
+                    <Badge colorScheme="green" hidden={status !== "offline"}>Selesai</Badge>
+                  </Flex>
                   <Text color="gray.400">
                     Dimulai pada{" "}
                     {dayjs(schedule.exam_date).format("DD MMM YYYY - HH:mm")}
@@ -226,7 +232,7 @@ const Home: React.FC = () => {
                     <Button
                       mt="4"
                       size="sm"
-                      disabled={!isMeetRequirement}
+                      disabled={!isMeetRequirement || status === "offline"}
                       rightIcon={<HiArrowRight />}
                       colorScheme="blue"
                       onClick={() => {

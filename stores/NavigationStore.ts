@@ -73,6 +73,7 @@ export class NavigationStore {
     try {
       this.ANSWERED_INDEX = [];
       this.VISITED_INDEX = [];
+      this.CURRENT_PATH = null;
       await clearPersist(this);
       return true;
     } catch (error) {

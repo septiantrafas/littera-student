@@ -105,11 +105,11 @@ export interface paths {
         query: {
           id?: parameters["rowFilter.answers.id"];
           schedule_id?: parameters["rowFilter.answers.schedule_id"];
-          profile_id?: parameters["rowFilter.answers.profile_id"];
           question_id?: parameters["rowFilter.answers.question_id"];
           value?: parameters["rowFilter.answers.value"];
           created_at?: parameters["rowFilter.answers.created_at"];
           updated_at?: parameters["rowFilter.answers.updated_at"];
+          participant_id?: parameters["rowFilter.answers.participant_id"];
           /** Filtering Columns */
           select?: parameters["select"];
           /** Ordering */
@@ -162,11 +162,11 @@ export interface paths {
         query: {
           id?: parameters["rowFilter.answers.id"];
           schedule_id?: parameters["rowFilter.answers.schedule_id"];
-          profile_id?: parameters["rowFilter.answers.profile_id"];
           question_id?: parameters["rowFilter.answers.question_id"];
           value?: parameters["rowFilter.answers.value"];
           created_at?: parameters["rowFilter.answers.created_at"];
           updated_at?: parameters["rowFilter.answers.updated_at"];
+          participant_id?: parameters["rowFilter.answers.participant_id"];
         };
         header: {
           /** Preference */
@@ -183,11 +183,11 @@ export interface paths {
         query: {
           id?: parameters["rowFilter.answers.id"];
           schedule_id?: parameters["rowFilter.answers.schedule_id"];
-          profile_id?: parameters["rowFilter.answers.profile_id"];
           question_id?: parameters["rowFilter.answers.question_id"];
           value?: parameters["rowFilter.answers.value"];
           created_at?: parameters["rowFilter.answers.created_at"];
           updated_at?: parameters["rowFilter.answers.updated_at"];
+          participant_id?: parameters["rowFilter.answers.participant_id"];
         };
         body: {
           /** answers */
@@ -417,6 +417,7 @@ export interface paths {
           profile_id?: parameters["rowFilter.participants.profile_id"];
           created_at?: parameters["rowFilter.participants.created_at"];
           updated_at?: parameters["rowFilter.participants.updated_at"];
+          status?: parameters["rowFilter.participants.status"];
           /** Filtering Columns */
           select?: parameters["select"];
           /** Ordering */
@@ -472,6 +473,7 @@ export interface paths {
           profile_id?: parameters["rowFilter.participants.profile_id"];
           created_at?: parameters["rowFilter.participants.created_at"];
           updated_at?: parameters["rowFilter.participants.updated_at"];
+          status?: parameters["rowFilter.participants.status"];
         };
         header: {
           /** Preference */
@@ -491,6 +493,7 @@ export interface paths {
           profile_id?: parameters["rowFilter.participants.profile_id"];
           created_at?: parameters["rowFilter.participants.created_at"];
           updated_at?: parameters["rowFilter.participants.updated_at"];
+          status?: parameters["rowFilter.participants.status"];
         };
         body: {
           /** participants */
@@ -513,12 +516,14 @@ export interface paths {
         query: {
           id?: parameters["rowFilter.profiles.id"];
           name?: parameters["rowFilter.profiles.name"];
+          email?: parameters["rowFilter.profiles.email"];
+          password?: parameters["rowFilter.profiles.password"];
           gender?: parameters["rowFilter.profiles.gender"];
           identity?: parameters["rowFilter.profiles.identity"];
           birth_date?: parameters["rowFilter.profiles.birth_date"];
-          email?: parameters["rowFilter.profiles.email"];
           address?: parameters["rowFilter.profiles.address"];
           photo_url?: parameters["rowFilter.profiles.photo_url"];
+          role?: parameters["rowFilter.profiles.role"];
           created_at?: parameters["rowFilter.profiles.created_at"];
           updated_at?: parameters["rowFilter.profiles.updated_at"];
           /** Filtering Columns */
@@ -573,12 +578,14 @@ export interface paths {
         query: {
           id?: parameters["rowFilter.profiles.id"];
           name?: parameters["rowFilter.profiles.name"];
+          email?: parameters["rowFilter.profiles.email"];
+          password?: parameters["rowFilter.profiles.password"];
           gender?: parameters["rowFilter.profiles.gender"];
           identity?: parameters["rowFilter.profiles.identity"];
           birth_date?: parameters["rowFilter.profiles.birth_date"];
-          email?: parameters["rowFilter.profiles.email"];
           address?: parameters["rowFilter.profiles.address"];
           photo_url?: parameters["rowFilter.profiles.photo_url"];
+          role?: parameters["rowFilter.profiles.role"];
           created_at?: parameters["rowFilter.profiles.created_at"];
           updated_at?: parameters["rowFilter.profiles.updated_at"];
         };
@@ -597,12 +604,14 @@ export interface paths {
         query: {
           id?: parameters["rowFilter.profiles.id"];
           name?: parameters["rowFilter.profiles.name"];
+          email?: parameters["rowFilter.profiles.email"];
+          password?: parameters["rowFilter.profiles.password"];
           gender?: parameters["rowFilter.profiles.gender"];
           identity?: parameters["rowFilter.profiles.identity"];
           birth_date?: parameters["rowFilter.profiles.birth_date"];
-          email?: parameters["rowFilter.profiles.email"];
           address?: parameters["rowFilter.profiles.address"];
           photo_url?: parameters["rowFilter.profiles.photo_url"];
+          role?: parameters["rowFilter.profiles.role"];
           created_at?: parameters["rowFilter.profiles.created_at"];
           updated_at?: parameters["rowFilter.profiles.updated_at"];
         };
@@ -954,6 +963,23 @@ export interface paths {
       };
     };
   };
+  "/rpc/handle_user_deletion": {
+    post: {
+      parameters: {
+        body: {
+          args: { [key: string]: unknown };
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferParams"];
+        };
+      };
+      responses: {
+        /** OK */
+        200: unknown;
+      };
+    };
+  };
   "/rpc/get_questions_by_schedule": {
     post: {
       parameters: {
@@ -973,47 +999,30 @@ export interface paths {
       };
     };
   };
-  "/rpc/handle_new_user": {
-    post: {
-      parameters: {
-        body: {
-          args: { [key: string]: any };
-        };
-        header: {
-          /** Preference */
-          Prefer?: parameters["preferParams"];
-        };
-      };
-      responses: {
-        /** OK */
-        200: unknown;
-      };
-    };
-  };
-  "/rpc/handle_user_deletion": {
-    post: {
-      parameters: {
-        body: {
-          args: { [key: string]: any };
-        };
-        header: {
-          /** Preference */
-          Prefer?: parameters["preferParams"];
-        };
-      };
-      responses: {
-        /** OK */
-        200: unknown;
-      };
-    };
-  };
   "/rpc/handle_new_participant": {
     post: {
       parameters: {
         body: {
+          args: { [key: string]: unknown };
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferParams"];
+        };
+      };
+      responses: {
+        /** OK */
+        200: unknown;
+      };
+    };
+  };
+  "/rpc/authorize": {
+    post: {
+      parameters: {
+        body: {
           args: {
-            id_of_profile: string;
-            id_of_schedule: number;
+            requested_permission: string;
+            user_id: string;
           };
         };
         header: {
@@ -1050,13 +1059,17 @@ export interface definitions {
     schedule_id: number;
     /**
      * Note:
-     * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+     * This is a Foreign Key to `questions.id`.<fk table='questions' column='id'/>
      */
-    participant_id: number;
     question_id: string;
     value: string;
     created_at: string;
     updated_at?: string;
+    /**
+     * Note:
+     * This is a Foreign Key to `participants.id`.<fk table='participants' column='id'/>
+     */
+    participant_id?: number;
   };
   organizations: {
     /**
@@ -1100,22 +1113,24 @@ export interface definitions {
     profile_id: string;
     created_at: string;
     updated_at: string;
+    status?: string;
   };
   profiles: {
     /**
      * Note:
      * This is a Primary Key.<pk/>
-     * This is a Foreign Key to `users.id`.<fk table='users' column='id'/>
      */
     id: string;
     name?: string;
+    email: string;
+    password: string;
     gender?: string;
     identity?: string;
     birth_date?: string;
-    email: string;
     address?: string;
     photo_url?: string;
-    created_at: string;
+    role?: string;
+    created_at?: string;
     updated_at?: string;
   };
   questions: {
@@ -1213,11 +1228,11 @@ export interface parameters {
   "body.answers": definitions["answers"];
   "rowFilter.answers.id": string;
   "rowFilter.answers.schedule_id": string;
-  "rowFilter.answers.profile_id": string;
   "rowFilter.answers.question_id": string;
   "rowFilter.answers.value": string;
   "rowFilter.answers.created_at": string;
   "rowFilter.answers.updated_at": string;
+  "rowFilter.answers.participant_id": string;
   /** organizations */
   "body.organizations": definitions["organizations"];
   "rowFilter.organizations.id": string;
@@ -1241,16 +1256,19 @@ export interface parameters {
   "rowFilter.participants.profile_id": string;
   "rowFilter.participants.created_at": string;
   "rowFilter.participants.updated_at": string;
+  "rowFilter.participants.status": string;
   /** profiles */
   "body.profiles": definitions["profiles"];
   "rowFilter.profiles.id": string;
   "rowFilter.profiles.name": string;
+  "rowFilter.profiles.email": string;
+  "rowFilter.profiles.password": string;
   "rowFilter.profiles.gender": string;
   "rowFilter.profiles.identity": string;
   "rowFilter.profiles.birth_date": string;
-  "rowFilter.profiles.email": string;
   "rowFilter.profiles.address": string;
   "rowFilter.profiles.photo_url": string;
+  "rowFilter.profiles.role": string;
   "rowFilter.profiles.created_at": string;
   "rowFilter.profiles.updated_at": string;
   /** questions */
@@ -1288,6 +1306,6 @@ export interface parameters {
   "rowFilter.sections.updated_at": string;
 }
 
-export interface operations { }
+export interface operations {}
 
-export interface external { }
+export interface external {}
