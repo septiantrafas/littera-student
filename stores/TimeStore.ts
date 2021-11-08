@@ -33,6 +33,7 @@ export class TimeStore {
   root: RootStore;
   TIME: string | undefined;
   START_TIME: string | undefined;
+  TIME_LEFT?: number;
   END_TIME: string | undefined;
   TIMEOUT_PATH: {
     package: string;
@@ -42,12 +43,12 @@ export class TimeStore {
   constructor(root: RootStore) {
     this.root = root;
     makeAutoObservable(this);
-    persistStore(this, ["END_TIME"], "TimeStore");
+    persistStore(this, ["TIME_LEFT"], "TimeStore");
   }
 
   clearStore = async () => {
     try {
-      await clearPersist(this.END_TIME);
+      await clearPersist(this.TIME_LEFT);
       return true;
     } catch (error) {
       console.error(error);
@@ -64,7 +65,7 @@ export class TimeStore {
         this.TIME = dayjs().toISOString();
       }
       this.START_TIME = dayjs().subtract(1, "minute").toISOString();
-      // this.END_TIME = dayjs().add(2, "minute").toISOString();
+      this.END_TIME = dayjs().add(2, "minute").toISOString();
       this.END_TIME = data.end_time != null ? data.end_time : "";
       this.TIMEOUT_PATH = data.timeout_path != null ? data.timeout_path : null;
     }
@@ -110,6 +111,7 @@ export class TimeStore {
         end_time.toDate().getTime() - now.toDate().getTime()
       ).utcOffset(0);
 
+      this.TIME_LEFT = time_difference.unix()
       return time_difference;
     } else {
       return dayjs(0);

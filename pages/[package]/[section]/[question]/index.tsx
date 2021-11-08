@@ -330,14 +330,14 @@ const ExamQuestionPage: React.FC = () => {
                   href={
                     navigation.previous_path
                       ? {
-                          pathname: "/[package]/[section]/[question]",
-                          query: {
-                            package: navigation.previous_path.params.package,
-                            section: navigation.previous_path.params.section,
-                            question:
-                              navigation.previous_path.params.question.id,
-                          },
-                        }
+                        pathname: "/[package]/[section]/[question]",
+                        query: {
+                          package: navigation.previous_path.params.package,
+                          section: navigation.previous_path.params.section,
+                          question:
+                            navigation.previous_path.params.question.id,
+                        },
+                      }
                       : ""
                   }
                 >
@@ -355,13 +355,13 @@ const ExamQuestionPage: React.FC = () => {
                   href={
                     navigation.next_path
                       ? {
-                          pathname: "/[package]/[section]/[question]",
-                          query: {
-                            package: navigation.next_path.params.package,
-                            section: navigation.next_path.params.section,
-                            question: navigation.next_path.params.question.id,
-                          },
-                        }
+                        pathname: "/[package]/[section]/[question]",
+                        query: {
+                          package: navigation.next_path.params.package,
+                          section: navigation.next_path.params.section,
+                          question: navigation.next_path.params.question.id,
+                        },
+                      }
                       : ""
                   }
                 >

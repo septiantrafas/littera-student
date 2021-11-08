@@ -33,7 +33,6 @@ const ThankyouPage: React.FC = () => {
     const isAnySelectedAnswer = navigationStore.ANSWERED_INDEX.length;
     const isFirstEntry = navigationStore.FIRST_ENTRY;
 
-    //TODO: CREATE A SUBMIT FEEDBACK SO USER KNOW WHAT'S GOING ON
     if (isAnySelectedAnswer && !isFirstEntry) {
       navigationStore.setFirstEntryState(false);
       setLoading(true);
@@ -56,16 +55,31 @@ const ThankyouPage: React.FC = () => {
             returning: "minimal",
             onConflict: "id",
           });
-
-          setLoading(false);
         } catch (error) {
-          console.log(error);
+          console.log("Saving answer error:", error);
         }
-      })();
 
-      navigationStore.clearStore();
-      timeStore.clearStore();
+
+        try {
+          await supabase.from<definitions["participants"]>("participants")
+            .update({ status: "offline" })
+            .match({ profile_id: user.id })
+        } catch (error) {
+          console.log("Update participant status error:", error);
+        }
+
+        setLoading(false);
+      })();
     }
+
+    (async () => {
+      try {
+        await navigationStore.clearStore();
+        await timeStore.clearStore();
+      } catch (error) {
+        console.log("Clear storage error:", error)
+      }
+    })()
   }, [navigationStore, navigationStore.ANSWERED_INDEX, user]);
 
   return (
