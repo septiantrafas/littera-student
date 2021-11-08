@@ -4,7 +4,8 @@ import { useRouter } from "next/router";
 import { GetStaticPaths, GetStaticPropsResult } from "next";
 import { observer } from "mobx-react-lite";
 
-import Exam from "@/layouts/exam";
+// import Exam from "@/layouts/exam";
+import Default from "@/layouts/default";
 import PageWithLayoutType from "@/types/pageWithLayout";
 import { Box, Button, Spinner, Text } from "@chakra-ui/react";
 import { useNavigationStore, useTimeStore } from "providers/RootStoreProvider";
@@ -58,6 +59,7 @@ const ExamCategoryPage: React.FC = () => {
   const [redirectPath, setRedirectPath] = useState({});
   const [data, setData] = useState<ISectionPageData>();
   const [duration, setDuration] = useState<any>();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const fetchPaths = useCallback(async () => {
     let data = null;
@@ -137,14 +139,16 @@ const ExamCategoryPage: React.FC = () => {
       console.log("section_time", time);
       const timeLeft = timeStore.calculateTimeLeft(timeStore.TIME);
 
-      if (!navigationStore.NEXT_PATH) {
+      if (!navigationStore.NEXT_PATH) { // if there's no next question
         if (isDevelopment) {
           timeStore.updateStartTime(
             dayjs().subtract(1, "minute").toISOString()
           );
 
-          if (timeLeft.unix() <= 0) {
-            timeStore.updateEndTime(dayjs().add(2, "minute").toISOString());
+          if (timeStore.TIME_LEFT <= 0 || !timeStore.TIME_LEFT) {
+            timeStore.updateEndTime(dayjs().add(2, "minutes").toISOString());
+          } else {
+            timeStore.updateEndTime(dayjs().add(timeStore.TIME_LEFT, "seconds").toISOString());
           }
 
           timeStore.updateTimeoutPath(next_section_url);
@@ -174,6 +178,7 @@ const ExamCategoryPage: React.FC = () => {
 
     //TODO: CREATE A SUBMIT FEEDBACK SO USER KNOW WHAT'S GOING ON
     if (isAnySelectedAnswer && !isFirstEntry) {
+      setLoading(true)
       navigationStore.setFirstEntryState(false);
       console.log("SUBMITTING");
       const body: IAnswerBody[] = navigationStore.ANSWERED_INDEX.map((item) => {
@@ -196,9 +201,10 @@ const ExamCategoryPage: React.FC = () => {
               onConflict: "id",
             });
 
-          console.log(res);
+          setLoading(false)
           if (res) navigationStore.clearStore();
         } catch (error) {
+          setLoading(false)
           console.log(error);
         }
       })();
@@ -257,13 +263,9 @@ const ExamCategoryPage: React.FC = () => {
             <Text>{data.context}</Text>
           </Box>
           <Box mx="20" mb="6">
-            {/* <Text fontSize="lg" fontWeight="semibold">
-          Contoh Soal
-        </Text>
-        <Text>{props.context}</Text> */}
             <NextLink href={redirectPath} prefetch={true} passHref>
-              <Button type="button" data-cy="start-button" mt="6">
-                Start
+              <Button isLoading={loading} type="button" data-cy="start-button" mt="6">
+                {loading ? "Menyimpan" : "Mulai"}
               </Button>
             </NextLink>
           </Box>
@@ -273,6 +275,6 @@ const ExamCategoryPage: React.FC = () => {
   );
 };
 
-(ExamCategoryPage as PageWithLayoutType).layout = Exam;
+(ExamCategoryPage as PageWithLayoutType).layout = Default;
 
 export default observer(ExamCategoryPage);
