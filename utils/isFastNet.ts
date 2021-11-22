@@ -2,8 +2,8 @@ const isFastNet = (callback, options = {}) => {
   // eslint-disable-next-line no-underscore-dangle
   const _options = {
     timesToTest: 5,
-    threshold: 200,
-    image: "https://www.google.com/images/phd/px.gif",
+    threshold: 1000,
+    image: "https://ipfs.io/ipfs/QmX7cwxUov4R9L9bp81j9sEMyfjv3bnYJXPog4LwuhbswG/1.png", // link to ipfs, should be up for another decade
     allowEarlyExit: true,
     verbose: false,
   };
