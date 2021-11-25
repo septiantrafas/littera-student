@@ -861,10 +861,11 @@ export interface paths {
           number?: parameters["rowFilter.sections.number"];
           titles?: parameters["rowFilter.sections.titles"];
           context?: parameters["rowFilter.sections.context"];
-          start_time?: parameters["rowFilter.sections.start_time"];
-          end_time?: parameters["rowFilter.sections.end_time"];
           created_at?: parameters["rowFilter.sections.created_at"];
           updated_at?: parameters["rowFilter.sections.updated_at"];
+          duration?: parameters["rowFilter.sections.duration"];
+          start_time?: parameters["rowFilter.sections.start_time"];
+          end_time?: parameters["rowFilter.sections.end_time"];
           /** Filtering Columns */
           select?: parameters["select"];
           /** Ordering */
@@ -920,10 +921,11 @@ export interface paths {
           number?: parameters["rowFilter.sections.number"];
           titles?: parameters["rowFilter.sections.titles"];
           context?: parameters["rowFilter.sections.context"];
-          start_time?: parameters["rowFilter.sections.start_time"];
-          end_time?: parameters["rowFilter.sections.end_time"];
           created_at?: parameters["rowFilter.sections.created_at"];
           updated_at?: parameters["rowFilter.sections.updated_at"];
+          duration?: parameters["rowFilter.sections.duration"];
+          start_time?: parameters["rowFilter.sections.start_time"];
+          end_time?: parameters["rowFilter.sections.end_time"];
         };
         header: {
           /** Preference */
@@ -943,10 +945,11 @@ export interface paths {
           number?: parameters["rowFilter.sections.number"];
           titles?: parameters["rowFilter.sections.titles"];
           context?: parameters["rowFilter.sections.context"];
-          start_time?: parameters["rowFilter.sections.start_time"];
-          end_time?: parameters["rowFilter.sections.end_time"];
           created_at?: parameters["rowFilter.sections.created_at"];
           updated_at?: parameters["rowFilter.sections.updated_at"];
+          duration?: parameters["rowFilter.sections.duration"];
+          start_time?: parameters["rowFilter.sections.start_time"];
+          end_time?: parameters["rowFilter.sections.end_time"];
         };
         body: {
           /** sections */
@@ -1193,10 +1196,11 @@ export interface definitions {
     number: number;
     titles: string;
     context: string;
-    start_time: string;
-    end_time: string;
     created_at: string;
     updated_at?: string;
+    duration?: number;
+    start_time?: string;
+    end_time?: string;
   };
 }
 
@@ -1300,10 +1304,11 @@ export interface parameters {
   "rowFilter.sections.number": string;
   "rowFilter.sections.titles": string;
   "rowFilter.sections.context": string;
-  "rowFilter.sections.start_time": string;
-  "rowFilter.sections.end_time": string;
   "rowFilter.sections.created_at": string;
   "rowFilter.sections.updated_at": string;
+  "rowFilter.sections.duration": string;
+  "rowFilter.sections.start_time": string;
+  "rowFilter.sections.end_time": string;
 }
 
 export interface operations {}

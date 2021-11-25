@@ -16,7 +16,7 @@ const LordIcon = dynamic(() => import("@/components/LordIcon"), {
 interface IAnswerBody {
   id: string;
   schedule_id: number;
-  profile_id: string;
+  participant_id: number;
   question_id: string;
   value: string;
 }
@@ -42,8 +42,8 @@ const ThankyouPage: React.FC = () => {
         return {
           id: navigationStore.answer_map[item.question_id],
           schedule_id: navigationStore.schedule_id,
-          profile_id: user.id,
           question_id: item.question_id,
+          participant_id: navigationStore.participant,
           value: item.option_id.toString(),
         };
       });
