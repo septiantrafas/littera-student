@@ -16,6 +16,7 @@ import "focus-visible/dist/focus-visible";
 import "styles/supabase.css";
 import "styles/globals.css";
 import "@fontsource/inter"
+import "styles/mathml.css"
 
 import ZoomContext from 'contexts/ZoomClientContext'
 import { useEffect, useState } from "react";
