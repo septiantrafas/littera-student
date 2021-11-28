@@ -15,6 +15,7 @@ import Router from "next/router";
 import "focus-visible/dist/focus-visible";
 import "styles/supabase.css";
 import "styles/globals.css";
+import "@fontsource/inter"
 
 import ZoomContext from 'contexts/ZoomClientContext'
 import { useEffect, useState } from "react";
