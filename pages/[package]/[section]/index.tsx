@@ -15,6 +15,7 @@ import NextLink from "next/link";
 import { Auth } from "@supabase/ui";
 import { log, Style } from "utils/consoleLogHelper";
 import { definitions } from "@/types/supabase";
+import ReactHtmlParser from "react-html-parser";
 
 dayjs.extend(timezone);
 
@@ -260,7 +261,9 @@ const ExamCategoryPage: React.FC = () => {
             <Text fontSize="lg" fontWeight="semibold">
               Instruksi
             </Text>
-            <Text>{data.context}</Text>
+            <Text>
+              {ReactHtmlParser(data.context)}
+            </Text>
           </Box>
           <Box mx="20" mb="6">
             <NextLink href={redirectPath} prefetch={true} passHref>

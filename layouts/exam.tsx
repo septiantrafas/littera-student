@@ -23,6 +23,7 @@ import { useRouter } from "next/router";
 import { useNavigationStore } from "providers/RootStoreProvider";
 import screenfull from "screenfull";
 import { supabase } from "utils/initSupabase";
+import ReactHtmlParser from "react-html-parser";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -162,7 +163,9 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
                     Instruksi dan Contoh Soal
                   </DrawerHeader>
                   <DrawerBody>
-                    <Text my="4">{navigation.getCurrentInstruction()}</Text>
+                    <Text my="4">
+                      {ReactHtmlParser(navigation.getCurrentInstruction())}
+                    </Text>
                   </DrawerBody>
                 </DrawerContent>
               </Drawer>
