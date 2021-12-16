@@ -147,7 +147,7 @@ const ExamCategoryPage: React.FC = () => {
           );
 
           if (timeStore.TIME_LEFT <= 0 || !timeStore.TIME_LEFT) {
-            timeStore.updateEndTime(dayjs().add(2, "minutes").toISOString());
+            timeStore.updateEndTime(dayjs().add(5, "minutes").toISOString());
           } else {
             timeStore.updateEndTime(dayjs().add(timeStore.TIME_LEFT, "seconds").toISOString());
           }
